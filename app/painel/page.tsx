@@ -1,0 +1,67 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { CartaoOS } from "@/components/painel/cartao-os";
+import { obterContexto } from "@/lib/sessao";
+
+export const metadata: Metadata = { title: "Pátio" };
+
+export default async function PaginaPainel() {
+  const ctx = await obterContexto();
+  if (!ctx) redirect("/login");
+
+  const inicioDoDia = new Date();
+  inicioDoDia.setUTCHours(3, 0, 0, 0);
+  if (inicioDoDia > new Date()) inicioDoDia.setUTCDate(inicioDoDia.getUTCDate() - 1);
+
+  const { data: ordens } = await ctx.supabase
+    .from("ordens_servico")
+    .select("id, status, valor_total, token_publico, plano_assinatura_id, criado_em, veiculos(placa, modelo, clientes(nome))")
+    .or(`status.neq.entregue,entregue_em.gte."${inicioDoDia.toISOString()}"`)
+    .order("criado_em", { ascending: false })
+    .limit(100);
+
+  const lista = ordens ?? [];
+  const noPatio = lista.filter((os) => os.status !== "entregue").length;
+
+  return (
+    <div className="grid gap-4">
+      <Link
+        href="/painel/nova"
+        className="flex h-14 items-center justify-center gap-2 rounded-full bg-texto text-base font-semibold text-fundo transition-transform hover:bg-white active:scale-[0.99]"
+      >
+        Nova entrada por placa
+      </Link>
+
+      <div className="flex items-baseline justify-between">
+        <h1 className="text-xl font-semibold">Pátio hoje</h1>
+        <span className="rounded-full border border-borda px-2.5 py-1 text-xs text-suave">{noPatio} em andamento</span>
+      </div>
+
+      {lista.length === 0 ? (
+        <p className="rounded-[1.25rem] border border-dashed border-borda p-8 text-center text-sm text-suave">
+          Nenhum veículo no pátio. Registre a primeira entrada.
+        </p>
+      ) : (
+        <ul className="grid gap-3">
+          {lista.map((os) =>
+            os.veiculos ? (
+              <li key={os.id}>
+                <CartaoOS
+                  id={os.id}
+                  status={os.status}
+                  token={os.token_publico}
+                  placa={os.veiculos.placa}
+                  modelo={os.veiculos.modelo}
+                  cliente={os.veiculos.clientes?.nome ?? ""}
+                  valor={Number(os.valor_total)}
+                  usouPlano={os.plano_assinatura_id !== null}
+                />
+              </li>
+            ) : null,
+          )}
+        </ul>
+      )}
+    </div>
+  );
+}
