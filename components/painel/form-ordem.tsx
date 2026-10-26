@@ -12,9 +12,16 @@ const MAX_FOTOS = 6;
 
 type Concluido = { link: string; aviso?: string };
 
-export function FormOrdem({ veiculoId, temPlano }: { veiculoId: string; temPlano: boolean }) {
+type PropsFormOrdem = {
+  veiculoId: string;
+  temPlano: boolean;
+  agendamentoId?: string;
+  servicosIniciais?: ServicoAvulso[];
+};
+
+export function FormOrdem({ veiculoId, temPlano, agendamentoId, servicosIniciais = [] }: PropsFormOrdem) {
   const [fotos, setFotos] = useState<File[]>([]);
-  const [servicos, setServicos] = useState<ServicoAvulso[]>([]);
+  const [servicos, setServicos] = useState<ServicoAvulso[]>(servicosIniciais);
   const [nomeServico, setNomeServico] = useState("");
   const [valorServico, setValorServico] = useState("");
   const [usarPlano, setUsarPlano] = useState(temPlano);
@@ -50,6 +57,7 @@ export function FormOrdem({ veiculoId, temPlano }: { veiculoId: string; temPlano
     formData.set("servicos", JSON.stringify(servicos));
     formData.set("usar_plano", String(usarPlano));
     formData.set("observacoes", observacoes);
+    if (agendamentoId) formData.set("agendamento_id", agendamentoId);
     fotos.forEach((foto) => formData.append("fotos", foto));
 
     iniciar(async () => {
@@ -61,7 +69,7 @@ export function FormOrdem({ veiculoId, temPlano }: { veiculoId: string; temPlano
 
   if (concluido) {
     return (
-      <section className="cartao grid gap-3 p-5">
+      <section className="cartao grid grid-cols-1 gap-3 p-5">
         <p className="texto-prata text-xl font-semibold">Ordem de serviço aberta</p>
         <p className="text-sm text-suave">
           {concluido.aviso ?? "O cliente recebeu o link de acompanhamento com as fotos da vistoria no WhatsApp."}

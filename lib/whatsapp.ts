@@ -89,3 +89,43 @@ export function mensagemStatus(status: "lavando" | "acabamento" | "pronto" | "en
   };
   return [textos[status], `Acompanhe: ${dados.link}`].join("\n\n");
 }
+
+type DadosAgendamento = {
+  empresa: string;
+  cliente: string;
+  servico: string;
+  quando: string;
+  placa: string | null;
+  link: string;
+};
+
+export function mensagemAgendamentoRecebido(dados: DadosAgendamento, confirmado: boolean): string {
+  return [
+    `Olá, ${dados.cliente}! ${confirmado ? "Seu horário está confirmado" : "Recebemos seu pedido de agendamento"} na ${dados.empresa}.`,
+    `${dados.servico}\n${dados.quando}${dados.placa ? `\nVeículo ${dados.placa}` : ""}`,
+    confirmado ? `Detalhes e cancelamento: ${dados.link}` : `Assim que a loja confirmar, você recebe uma mensagem. Acompanhe: ${dados.link}`,
+  ].join("\n\n");
+}
+
+export function mensagemNovoAgendamentoLoja(dados: DadosAgendamento & { whatsappCliente: string }): string {
+  return [
+    `Novo agendamento pela agenda online.`,
+    `${dados.cliente} · ${dados.whatsappCliente}\n${dados.servico}\n${dados.quando}${dados.placa ? `\nVeículo ${dados.placa}` : ""}`,
+    "Confirme no painel da Synex Auto, na aba Agenda.",
+  ].join("\n\n");
+}
+
+export function mensagemAgendamentoConfirmado(dados: DadosAgendamento): string {
+  return [
+    `Olá, ${dados.cliente}! Seu horário na ${dados.empresa} está confirmado.`,
+    `${dados.servico}\n${dados.quando}`,
+    `Se precisar cancelar: ${dados.link}`,
+  ].join("\n\n");
+}
+
+export function mensagemAgendamentoCancelado(dados: DadosAgendamento): string {
+  return [
+    `Olá, ${dados.cliente}. Seu agendamento de ${dados.servico} para ${dados.quando} na ${dados.empresa} foi cancelado.`,
+    `Para marcar outro horário: ${dados.link}`,
+  ].join("\n\n");
+}

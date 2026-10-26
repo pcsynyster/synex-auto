@@ -10,7 +10,7 @@ export async function obterContexto() {
 
   const { data: perfil } = await supabase
     .from("perfis")
-    .select("tenant_id, papel, tenants(nome, telefone, chave_pix, status_assinatura, assinatura_valida_ate)")
+    .select("tenant_id, papel, tenants(nome, slug, telefone, chave_pix, fuso, status_assinatura, assinatura_valida_ate)")
     .eq("id", usuarioId)
     .single();
 

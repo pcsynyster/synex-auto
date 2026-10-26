@@ -1,0 +1,50 @@
+import type { StatusAgendamento } from "@/types/database.types";
+
+export type ServicoPublico = {
+  id: string;
+  nome: string;
+  descricao: string | null;
+  duracao_min: number;
+  preco: number;
+};
+
+export type AgendaPublica = {
+  nome: string;
+  cidade: string | null;
+  telefone: string;
+  fuso: string;
+  hoje: string;
+  janela_dias: number;
+  dias_abertos: number[];
+  dias_bloqueados: string[];
+  servicos: ServicoPublico[];
+};
+
+export type AgendamentoPublico = {
+  status: StatusAgendamento;
+  inicio: string;
+  fim: string;
+  servico: string;
+  preco: number;
+  duracao_min: number;
+  placa: string | null;
+  modelo: string | null;
+  nome: string;
+  empresa: string;
+  telefone_empresa: string;
+  cidade: string | null;
+  slug: string;
+  fuso: string;
+  pode_cancelar: boolean;
+};
+
+export const ROTULO_STATUS_AGENDAMENTO: Record<StatusAgendamento, string> = {
+  pendente: "Aguardando confirmação",
+  confirmado: "Confirmado",
+  concluido: "Atendido",
+  cancelado: "Cancelado",
+  nao_compareceu: "Não compareceu",
+};
+
+export const PADRAO_TOKEN = /^[a-f0-9]{48}$/;
+export const PADRAO_SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;

@@ -11,6 +11,15 @@ import { CATEGORIAS_VEICULO, type CategoriaVeiculo } from "@/types/database.type
 
 type VeiculoCarregado = Extract<EntradaPorPlaca, { situacao: "existente" | "criado" }>["veiculo"];
 
+export type PreenchimentoEntrada = {
+  agendamentoId: string;
+  placa: string;
+  nome: string;
+  whatsapp: string;
+  modelo: string;
+  servico: { nome: string; valor: number };
+};
+
 const ROTULO_CATEGORIA: Record<CategoriaVeiculo, string> = {
   hatch: "Hatch",
   sedan: "Sedan",
@@ -18,8 +27,8 @@ const ROTULO_CATEGORIA: Record<CategoriaVeiculo, string> = {
   pickup: "Pickup",
 };
 
-export function NovaEntrada() {
-  const [placa, setPlaca] = useState("");
+export function NovaEntrada({ preenchimento }: { preenchimento?: PreenchimentoEntrada }) {
+  const [placa, setPlaca] = useState(preenchimento?.placa ?? "");
   const [cadastro, setCadastro] = useState(false);
   const [categoria, setCategoria] = useState<CategoriaVeiculo>("hatch");
   const [veiculo, setVeiculo] = useState<VeiculoCarregado | null>(null);
@@ -63,7 +72,12 @@ export function NovaEntrada() {
             </p>
           )}
         </section>
-        <FormOrdem veiculoId={veiculo.id} temPlano={veiculo.planoAtivo !== null} />
+        <FormOrdem
+          veiculoId={veiculo.id}
+          temPlano={veiculo.planoAtivo !== null}
+          agendamentoId={preenchimento?.agendamentoId}
+          servicosIniciais={preenchimento && veiculo.planoAtivo === null ? [preenchimento.servico] : []}
+        />
       </div>
     );
   }
@@ -76,6 +90,13 @@ export function NovaEntrada() {
           Voltar
         </Link>
       </div>
+
+      {preenchimento && (
+        <p className="rounded-2xl border border-borda bg-elevado/60 px-4 py-3 text-sm">
+          Agendamento de <strong className="font-semibold">{preenchimento.nome}</strong> · {preenchimento.servico.nome}
+          {!preenchimento.placa && <span className="block text-xs text-suave">O cliente não informou a placa. Digite abaixo.</span>}
+        </p>
+      )}
 
       <label className="grid gap-1.5">
         <span className="text-xs font-medium text-suave">Placa</span>
@@ -96,11 +117,11 @@ export function NovaEntrada() {
       </label>
 
       {cadastro && (
-        <section className="cartao grid gap-4 p-4">
+        <section className="cartao grid grid-cols-1 gap-4 p-4">
           <p className="text-sm">Placa nova. Cadastre o cliente e o veículo.</p>
-          <Campo rotulo="Nome do cliente" name="cliente_nome" autoComplete="off" required />
-          <Campo rotulo="WhatsApp do cliente" name="whatsapp" inputMode="tel" placeholder="(84) 99999-9999" required />
-          <Campo rotulo="Modelo" name="modelo" placeholder="Onix, Compass, Hilux..." autoComplete="off" required />
+          <Campo rotulo="Nome do cliente" name="cliente_nome" autoComplete="off" defaultValue={preenchimento?.nome} required />
+          <Campo rotulo="WhatsApp do cliente" name="whatsapp" inputMode="tel" placeholder="(84) 99999-9999" defaultValue={preenchimento?.whatsapp} required />
+          <Campo rotulo="Modelo" name="modelo" placeholder="Onix, Compass, Hilux..." autoComplete="off" defaultValue={preenchimento?.modelo} required />
           <div className="grid gap-1.5">
             <span className="text-xs font-medium text-suave">Categoria</span>
             <div className="grid grid-cols-4 gap-2">

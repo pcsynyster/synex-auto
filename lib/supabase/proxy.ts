@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database.types";
 
-const ROTAS_PUBLICAS = ["/login", "/os", "/api/os", "/manifest.webmanifest", "/brand"];
+const ROTAS_PUBLICAS = ["/login", "/os", "/api/os", "/agendar", "/agendamento", "/manifest.webmanifest", "/brand"];
 
 export async function atualizarSessao(request: NextRequest) {
   let response = NextResponse.next({ request });

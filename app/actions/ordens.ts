@@ -148,7 +148,16 @@ export async function criarOrdemServico(formData: FormData): Promise<Resultado<O
     return falha(traduzirErroBanco(error?.message ?? ""));
   }
 
-  revalidatePath("/painel");
+  const agendamentoId = formData.get("agendamento_id");
+  if (typeof agendamentoId === "string" && z.uuid().safeParse(agendamentoId).success) {
+    await ctx.supabase
+      .from("agendamentos")
+      .update({ status: "concluido", ordem_servico_id: os.id })
+      .eq("id", agendamentoId)
+      .in("status", ["pendente", "confirmado"]);
+  }
+
+  revalidatePath("/painel", "layout");
 
   const notificacao = await dadosNotificacao(ctx, os);
   const envio = notificacao

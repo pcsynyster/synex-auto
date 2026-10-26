@@ -8,7 +8,7 @@ export function Campo({ rotulo, className = "", ...props }: CampoProps) {
       <span className="text-xs font-medium text-suave">{rotulo}</span>
       <input
         {...props}
-        className={`h-12 rounded-2xl border border-borda bg-elevado px-4 text-base text-texto placeholder:text-suave/60 transition-colors focus:border-prata focus:outline-none ${className}`}
+        className={`h-12 w-full min-w-0 rounded-2xl border border-borda bg-elevado px-4 text-base text-texto placeholder:text-suave/60 transition-colors focus:border-prata focus:outline-none ${className}`}
       />
     </label>
   );

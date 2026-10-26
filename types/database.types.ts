@@ -16,6 +16,13 @@ export type Database = {
           chave_pix: string | null;
           status_assinatura: Database["public"]["Enums"]["status_assinatura_tenant"];
           assinatura_valida_ate: string;
+          fuso: string;
+          agenda_ativa: boolean;
+          confirmacao_automatica: boolean;
+          intervalo_agenda_min: number;
+          capacidade_simultanea: number;
+          antecedencia_min_horas: number;
+          janela_dias: number;
           criado_em: string;
           atualizado_em: string;
         };
@@ -36,6 +43,12 @@ export type Database = {
           telefone?: string;
           cidade?: string | null;
           chave_pix?: string | null;
+          agenda_ativa?: boolean;
+          confirmacao_automatica?: boolean;
+          intervalo_agenda_min?: number;
+          capacidade_simultanea?: number;
+          antecedencia_min_horas?: number;
+          janela_dias?: number;
         };
         Relationships: [];
       };
@@ -242,6 +255,147 @@ export type Database = {
           },
         ];
       };
+      servicos: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          nome: string;
+          descricao: string | null;
+          duracao_min: number;
+          preco: number;
+          ativo: boolean;
+          ordem: number;
+          criado_em: string;
+          atualizado_em: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          nome: string;
+          descricao?: string | null;
+          duracao_min: number;
+          preco?: number;
+          ativo?: boolean;
+          ordem?: number;
+        };
+        Update: {
+          nome?: string;
+          descricao?: string | null;
+          duracao_min?: number;
+          preco?: number;
+          ativo?: boolean;
+          ordem?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "servicos_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      horarios_funcionamento: {
+        Row: {
+          tenant_id: string;
+          dia_semana: number;
+          abre: string;
+          fecha: string;
+          ativo: boolean;
+        };
+        Insert: {
+          tenant_id: string;
+          dia_semana: number;
+          abre: string;
+          fecha: string;
+          ativo?: boolean;
+        };
+        Update: {
+          abre?: string;
+          fecha?: string;
+          ativo?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "horarios_funcionamento_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      bloqueios_agenda: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          inicio: string;
+          fim: string;
+          motivo: string | null;
+          criado_em: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          inicio: string;
+          fim: string;
+          motivo?: string | null;
+        };
+        Update: {
+          inicio?: string;
+          fim?: string;
+          motivo?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bloqueios_agenda_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      agendamentos: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          servico_id: string | null;
+          cliente_id: string | null;
+          ordem_servico_id: string | null;
+          nome_cliente: string;
+          whatsapp: string;
+          placa: string | null;
+          modelo: string | null;
+          servico_nome: string;
+          duracao_min: number;
+          preco: number;
+          inicio: string;
+          fim: string;
+          status: Database["public"]["Enums"]["status_agendamento"];
+          observacoes: string | null;
+          origem: string;
+          token_publico: string;
+          criado_em: string;
+          atualizado_em: string;
+        };
+        Insert: never;
+        Update: {
+          status?: Database["public"]["Enums"]["status_agendamento"];
+          observacoes?: string | null;
+          ordem_servico_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "agendamentos_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "tenants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -262,6 +416,35 @@ export type Database = {
         };
         Returns: Database["public"]["Tables"]["ordens_servico"]["Row"];
       };
+      agenda_publica: {
+        Args: { p_slug: string };
+        Returns: Json;
+      };
+      horarios_disponiveis: {
+        Args: { p_slug: string; p_servico_id: string; p_data: string };
+        Returns: string[];
+      };
+      agendamento_publico: {
+        Args: { p_token: string };
+        Returns: Json;
+      };
+      criar_agendamento_publico: {
+        Args: {
+          p_slug: string;
+          p_servico_id: string;
+          p_inicio: string;
+          p_nome: string;
+          p_whatsapp: string;
+          p_placa: string | null;
+          p_modelo: string | null;
+          p_observacoes: string | null;
+        };
+        Returns: Json;
+      };
+      cancelar_agendamento_publico: {
+        Args: { p_token: string };
+        Returns: Json;
+      };
       avancar_status_os: {
         Args: {
           p_os_id: string;
@@ -271,6 +454,7 @@ export type Database = {
       };
     };
     Enums: {
+      status_agendamento: "pendente" | "confirmado" | "concluido" | "cancelado" | "nao_compareceu";
       status_assinatura_tenant: "trial" | "ativa" | "inadimplente" | "cancelada";
       categoria_veiculo: "hatch" | "sedan" | "suv" | "pickup";
       status_plano: "ativo" | "esgotado" | "expirado" | "cancelado";
@@ -300,6 +484,11 @@ export type OrdemServico = Tables<"ordens_servico">;
 export type StatusOS = Enums<"status_os">;
 export type CategoriaVeiculo = Enums<"categoria_veiculo">;
 export type StatusPlano = Enums<"status_plano">;
+export type StatusAgendamento = Enums<"status_agendamento">;
+export type Servico = Tables<"servicos">;
+export type HorarioFuncionamento = Tables<"horarios_funcionamento">;
+export type BloqueioAgenda = Tables<"bloqueios_agenda">;
+export type Agendamento = Tables<"agendamentos">;
 
 export type ServicoAvulso = {
   nome: string;

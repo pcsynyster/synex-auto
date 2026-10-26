@@ -27,6 +27,16 @@ Next.js 16 (App Router), TypeScript, Tailwind CSS 4, Supabase (Postgres, Auth, S
 - **WhatsApp:** a mensagem com o link de vistoria é enviada na abertura da OS. Os status notificados são definidos em `WHATSAPP_NOTIFICAR_STATUS` (padrão `pronto`). Falhas no envio não desfazem a OS; a interface mostra um aviso.
 - **Tempo real:** a página pública consulta `/api/os/[token]` a cada 15 s e quando a aba volta ao foco. O Realtime do Supabase não repassa o cabeçalho do token para o RLS.
 
+## Agenda
+
+- **Link público:** `/agendar/[slug]`. O cliente escolhe serviço, dia e horário, informa nome, WhatsApp e, se quiser, placa e modelo. Recebe um link `/agendamento/[token]` para acompanhar e cancelar até 2 horas antes.
+- **Horários livres:** calculados no banco por `horarios_disponiveis`, a partir do horário de funcionamento do dia, do intervalo da grade, da duração do serviço, da antecedência mínima, dos dias fechados e da capacidade (carros ao mesmo tempo). Um serviço de 3h ocupa a vaga pelas 3h.
+- **Sem conflito:** `criar_agendamento_publico` trava a agenda da empresa durante a gravação e confere o horário de novo, então dois clientes não pegam a mesma vaga. Cada WhatsApp pode ter até 3 agendamentos ativos por loja.
+- **Painel:** aba Agenda com os dias, contagem por dia e ações por status (confirmar, recusar, não veio, cancelar). "Cliente chegou" abre a entrada por placa já preenchida; ao abrir a OS, o agendamento vira "Atendido".
+- **Configuração:** `/painel/agenda/config` para ligar a agenda, confirmação automática, horários por dia, intervalo, capacidade, antecedência, janela de dias, serviços e dias fechados.
+- **WhatsApp:** o cliente recebe a confirmação do pedido, a loja recebe o aviso de novo agendamento, e o cliente é avisado quando o dono confirma ou cancela.
+- Toda empresa nova já nasce com horário de segunda a sábado e 4 serviços de exemplo, editáveis.
+
 ## Estrutura
 
 ```
