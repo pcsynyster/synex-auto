@@ -6,13 +6,14 @@ import { usePathname } from "next/navigation";
 const ABAS = [
   { href: "/painel", rotulo: "Serviços", ativa: (caminho: string) => caminho === "/painel" || caminho.startsWith("/painel/nova") },
   { href: "/painel/agenda", rotulo: "Agenda", ativa: (caminho: string) => caminho.startsWith("/painel/agenda") },
+  { href: "/painel/resumo", rotulo: "Resumo", ativa: (caminho: string) => caminho.startsWith("/painel/resumo") },
 ];
 
 export function AbasPainel({ pendentes }: { pendentes: number }) {
   const caminho = usePathname();
 
   return (
-    <nav className="grid grid-cols-2 gap-1 rounded-full border border-borda bg-elevado/60 p-1" aria-label="Seções do painel">
+    <nav className="grid grid-cols-3 gap-1 rounded-full border border-borda bg-elevado/60 p-1" aria-label="Seções do painel">
       {ABAS.map((aba) => {
         const ativa = aba.ativa(caminho);
         return (

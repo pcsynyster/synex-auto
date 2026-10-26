@@ -459,6 +459,10 @@ export type Database = {
         Args: { p_tenant: string; p_slug: string };
         Returns: string;
       };
+      resumo_painel: {
+        Args: { p_inicio: string; p_fim: string; p_agrupar?: string };
+        Returns: Json;
+      };
       slug_atual: {
         Args: { p_slug: string };
         Returns: string | null;
