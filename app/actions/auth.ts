@@ -43,7 +43,12 @@ export async function entrar(_estado: EstadoAuth, formData: FormData): Promise<E
     email: validacao.data.email,
     password: validacao.data.senha,
   });
-  if (error) return { erro: "E-mail ou senha incorretos." };
+  if (error) {
+    if (/not confirmed/i.test(error.message)) {
+      return { erro: "Seu e-mail ainda não foi confirmado. Abra o e-mail de confirmação que enviamos ou fale com a Synex." };
+    }
+    return { erro: "E-mail ou senha incorretos." };
+  }
 
   redirect(destinoSeguro(formData.get("voltar")));
 }
@@ -76,7 +81,7 @@ export async function cadastrar(_estado: EstadoAuth, formData: FormData): Promis
     }
     return { erro: "Não foi possível criar a conta. Tente novamente." };
   }
-  if (!data.session) return { mensagem: "Conta criada. Confirme o e-mail para entrar." };
+  if (!data.session) return { mensagem: "Conta criada! Enviamos um e-mail de confirmação. Abra o link (veja também o spam) e depois entre aqui." };
 
   redirect("/painel");
 }
