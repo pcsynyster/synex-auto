@@ -8,7 +8,7 @@ import { normalizarWhatsapp } from "@/lib/telefone";
 export type EstadoAuth = { erro?: string; mensagem?: string };
 
 const esquemaEntrar = z.object({
-  email: z.email(),
+  email: z.email().transform((valor) => valor.trim().toLowerCase()),
   senha: z.string().min(8),
 });
 
@@ -69,7 +69,13 @@ export async function cadastrar(_estado: EstadoAuth, formData: FormData): Promis
     },
   });
 
-  if (error) return { erro: "Não foi possível criar a conta. Verifique o e-mail informado." };
+  if (error) {
+    if (/already|registered|exists/i.test(error.message)) return { erro: "Esse e-mail já tem conta. Use Entrar." };
+    if (/database error/i.test(error.message)) {
+      return { erro: "Esse e-mail não tem convite ativo. Use o mesmo e-mail que você passou para a Synex." };
+    }
+    return { erro: "Não foi possível criar a conta. Tente novamente." };
+  }
   if (!data.session) return { mensagem: "Conta criada. Confirme o e-mail para entrar." };
 
   redirect("/painel");

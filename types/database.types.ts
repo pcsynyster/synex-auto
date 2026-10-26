@@ -23,6 +23,7 @@ export type Database = {
           capacidade_simultanea: number;
           antecedencia_min_horas: number;
           janela_dias: number;
+          valor_mensal: number;
           criado_em: string;
           atualizado_em: string;
         };
@@ -255,6 +256,31 @@ export type Database = {
           },
         ];
       };
+      administradores: {
+        Row: { user_id: string; criado_em: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      convites: {
+        Row: {
+          email: string;
+          nome_empresa: string | null;
+          dias_teste: number;
+          valor_mensal: number;
+          criado_em: string;
+          usado_em: string | null;
+          tenant_id: string | null;
+        };
+        Insert: {
+          email: string;
+          nome_empresa?: string | null;
+          dias_teste?: number;
+          valor_mensal?: number;
+        };
+        Update: never;
+        Relationships: [];
+      };
       servicos: {
         Row: {
           id: string;
@@ -416,6 +442,40 @@ export type Database = {
         };
         Returns: Database["public"]["Tables"]["ordens_servico"]["Row"];
       };
+      eh_admin: {
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
+      admin_listar_esteticas: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          id: string;
+          nome: string;
+          slug: string;
+          telefone: string;
+          cidade: string | null;
+          email_dono: string | null;
+          status_assinatura: Database["public"]["Enums"]["status_assinatura_tenant"];
+          assinatura_valida_ate: string;
+          valor_mensal: number;
+          criado_em: string;
+          total_os: number;
+          os_30_dias: number;
+          ultima_os: string | null;
+        }[];
+      };
+      admin_registrar_pagamento: {
+        Args: { p_tenant: string; p_dias: number };
+        Returns: Database["public"]["Tables"]["tenants"]["Row"];
+      };
+      admin_definir_status: {
+        Args: {
+          p_tenant: string;
+          p_status: Database["public"]["Enums"]["status_assinatura_tenant"];
+          p_valor?: number | null;
+        };
+        Returns: Database["public"]["Tables"]["tenants"]["Row"];
+      };
       agenda_publica: {
         Args: { p_slug: string };
         Returns: Json;
@@ -489,6 +549,8 @@ export type Servico = Tables<"servicos">;
 export type HorarioFuncionamento = Tables<"horarios_funcionamento">;
 export type BloqueioAgenda = Tables<"bloqueios_agenda">;
 export type Agendamento = Tables<"agendamentos">;
+export type Convite = Tables<"convites">;
+export type StatusAssinatura = Enums<"status_assinatura_tenant">;
 
 export type ServicoAvulso = {
   nome: string;

@@ -7,7 +7,7 @@ import { Campo } from "@/components/ui/campo";
 
 type Modo = "entrar" | "cadastrar";
 
-function FormModo({ modo, voltar }: { modo: Modo; voltar: string }) {
+function FormModo({ modo, voltar, emailInicial }: { modo: Modo; voltar: string; emailInicial?: string }) {
   const [estado, acao, pendente] = useActionState<EstadoAuth, FormData>(modo === "entrar" ? entrar : cadastrar, {});
 
   return (
@@ -21,7 +21,7 @@ function FormModo({ modo, voltar }: { modo: Modo; voltar: string }) {
           <Campo rotulo="Cidade" name="cidade" autoComplete="address-level2" required />
         </>
       )}
-      <Campo rotulo="E-mail" name="email" type="email" autoComplete="email" required />
+      <Campo rotulo="E-mail" name="email" type="email" autoComplete="email" defaultValue={emailInicial} required />
       <Campo
         rotulo="Senha"
         name="senha"
@@ -35,24 +35,29 @@ function FormModo({ modo, voltar }: { modo: Modo; voltar: string }) {
       {estado.mensagem && <p className="text-sm text-texto">{estado.mensagem}</p>}
 
       <Botao type="submit" disabled={pendente}>
-        {pendente ? "Aguarde..." : modo === "entrar" ? "Entrar" : "Criar conta e testar grátis"}
+        {pendente ? "Aguarde..." : modo === "entrar" ? "Entrar" : "Criar minha conta"}
       </Botao>
     </form>
   );
 }
 
-export function FormAcesso({ voltar }: { voltar: string }) {
-  const [modo, setModo] = useState<Modo>("entrar");
+export function FormAcesso({ voltar, convite }: { voltar: string; convite?: string }) {
+  const [modo, setModo] = useState<Modo>(convite ? "cadastrar" : "entrar");
 
   return (
     <div className="grid gap-4">
-      <FormModo key={modo} modo={modo} voltar={voltar} />
+      {modo === "cadastrar" && (
+        <p className="rounded-2xl border border-borda bg-elevado/60 px-4 py-3 text-sm text-suave">
+          Use o mesmo e-mail que você passou para a Synex. O cadastro só funciona para e-mails autorizados.
+        </p>
+      )}
+      <FormModo key={modo} modo={modo} voltar={voltar} emailInicial={convite} />
       <button
         type="button"
         onClick={() => setModo(modo === "entrar" ? "cadastrar" : "entrar")}
         className="text-sm text-suave underline-offset-4 hover:underline"
       >
-        {modo === "entrar" ? "Ainda não tem conta? Teste 14 dias grátis" : "Já tenho conta"}
+        {modo === "entrar" ? "Recebeu um convite? Criar conta" : "Já tenho conta"}
       </button>
     </div>
   );
