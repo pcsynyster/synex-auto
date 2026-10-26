@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CancelarAgendamento } from "@/components/agenda/cancelar-agendamento";
+import { BotaoWhatsapp } from "@/components/ui/botao-whatsapp";
 import { RodapeSynex } from "@/components/ui/rodape-synex";
 import { PADRAO_TOKEN, ROTULO_STATUS_AGENDAMENTO, type AgendamentoPublico } from "@/lib/agenda";
 import { dataNoFuso, formatarDuracao, horaNoFuso, rotuloDataLonga } from "@/lib/datas";
@@ -82,12 +83,22 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
       </section>
 
       <div className="grid gap-2">
-        <a
-          href={linkWhatsapp(agendamento.telefone_empresa)}
-          className="flex h-12 items-center justify-center rounded-full border border-borda bg-elevado/60 text-sm font-semibold"
-        >
-          Falar com a loja
-        </a>
+        {agendamento.status === "pendente" ? (
+          <BotaoWhatsapp
+            rotulo="Avisar a loja no WhatsApp"
+            link={linkWhatsapp(
+              agendamento.telefone_empresa,
+              `Olá! Sou ${agendamento.nome} e acabei de agendar ${agendamento.servico} para ${rotuloDataLonga(data_)}, às ${horaNoFuso(agendamento.inicio, agendamento.fuso)}${agendamento.placa ? `, veículo ${formatarPlaca(agendamento.placa)}` : ""}.`,
+            )}
+          />
+        ) : (
+          <a
+            href={linkWhatsapp(agendamento.telefone_empresa)}
+            className="flex h-12 items-center justify-center rounded-full border border-borda bg-elevado/60 text-sm font-semibold"
+          >
+            Falar com a loja
+          </a>
+        )}
         {agendamento.pode_cancelar && <CancelarAgendamento token={token} />}
         {!ativo && (
           <Link

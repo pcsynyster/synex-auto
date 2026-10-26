@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { atualizarStatusOS } from "@/app/actions/ordens";
+import { BotaoWhatsapp } from "@/components/ui/botao-whatsapp";
 import { formatarMoeda } from "@/lib/formato";
 import { formatarPlaca } from "@/lib/placa";
 import { ROTULO_STATUS, progressoStatus, proximoStatus } from "@/lib/os-status";
@@ -21,6 +22,7 @@ type CartaoOSProps = {
 export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, usouPlano }: CartaoOSProps) {
   const [pendente, iniciar] = useTransition();
   const [aviso, setAviso] = useState<string | null>(null);
+  const [whatsapp, setWhatsapp] = useState<string | null>(null);
   const proximo = proximoStatus(status);
 
   function avancar() {
@@ -28,8 +30,9 @@ export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, uso
     setAviso(null);
     iniciar(async () => {
       const resultado = await atualizarStatusOS(id, proximo);
-      if (!resultado.ok) setAviso(resultado.erro);
-      else if (resultado.aviso) setAviso(resultado.aviso);
+      if (!resultado.ok) return setAviso(resultado.erro);
+      if (resultado.aviso) setAviso(resultado.aviso);
+      setWhatsapp(resultado.whatsapp ?? null);
     });
   }
 
@@ -57,6 +60,12 @@ export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, uso
       </div>
 
       {aviso && <p className="mt-2 text-xs text-alerta">{aviso}</p>}
+
+      {whatsapp && (
+        <div className="mt-3">
+          <BotaoWhatsapp link={whatsapp} rotulo="Avisar cliente no WhatsApp" aoClicar={() => setWhatsapp(null)} />
+        </div>
+      )}
 
       {proximo && (
         <button

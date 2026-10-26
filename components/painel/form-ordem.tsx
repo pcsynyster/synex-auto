@@ -4,13 +4,14 @@ import Image from "next/image";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { criarOrdemServico } from "@/app/actions/ordens";
 import { Botao } from "@/components/ui/botao";
+import { BotaoWhatsapp } from "@/components/ui/botao-whatsapp";
 import { formatarMoeda } from "@/lib/formato";
 import { comprimirImagem } from "@/lib/imagem";
 import type { ServicoAvulso } from "@/types/database.types";
 
 const MAX_FOTOS = 6;
 
-type Concluido = { link: string; aviso?: string };
+type Concluido = { link: string; aviso?: string; whatsapp?: string };
 
 type PropsFormOrdem = {
   veiculoId: string;
@@ -63,7 +64,7 @@ export function FormOrdem({ veiculoId, temPlano, agendamentoId, servicosIniciais
     iniciar(async () => {
       const resultado = await criarOrdemServico(formData);
       if (!resultado.ok) return setErro(resultado.erro);
-      setConcluido({ link: `${window.location.origin}/os/${resultado.dados.token_publico}`, aviso: resultado.aviso });
+      setConcluido({ link: `${window.location.origin}/os/${resultado.dados.token_publico}`, aviso: resultado.aviso, whatsapp: resultado.whatsapp });
     });
   }
 
@@ -72,8 +73,11 @@ export function FormOrdem({ veiculoId, temPlano, agendamentoId, servicosIniciais
       <section className="cartao grid grid-cols-1 gap-3 p-5">
         <p className="texto-prata text-xl font-semibold">Ordem de serviço aberta</p>
         <p className="text-sm text-suave">
-          {concluido.aviso ?? "O cliente recebeu o link de acompanhamento com as fotos da vistoria no WhatsApp."}
+          {concluido.whatsapp
+            ? concluido.aviso ?? "Envie para o cliente o link de acompanhamento com as fotos da vistoria."
+            : "O cliente recebeu o link de acompanhamento com as fotos da vistoria no WhatsApp."}
         </p>
+        {concluido.whatsapp && <BotaoWhatsapp link={concluido.whatsapp} rotulo="Enviar no WhatsApp do cliente" />}
         <p className="break-all rounded-lg border border-borda bg-fundo/60 p-3 font-mono text-xs">{concluido.link}</p>
         <div className="grid grid-cols-2 gap-2">
           <Botao variante="secundario" type="button" onClick={() => void navigator.clipboard.writeText(concluido.link)}>

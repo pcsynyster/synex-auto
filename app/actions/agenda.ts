@@ -6,7 +6,7 @@ import { env } from "@/lib/env";
 import { dataNoFuso, dataValida, horaNoFuso, instanteLocal, rotuloDataLonga, somarDias } from "@/lib/datas";
 import { falha, sucesso, type Resultado } from "@/lib/resultado";
 import { obterContexto } from "@/lib/sessao";
-import { enviarWhatsapp, mensagemAgendamentoCancelado, mensagemAgendamentoConfirmado } from "@/lib/whatsapp";
+import { avisoNotificacao, mensagemAgendamentoCancelado, mensagemAgendamentoConfirmado, notificar } from "@/lib/whatsapp";
 import type { StatusAgendamento } from "@/types/database.types";
 
 const TRANSICOES: Record<"confirmado" | "cancelado" | "nao_compareceu", StatusAgendamento[]> = {
@@ -52,12 +52,12 @@ export async function atualizarStatusAgendamento(
     link: status === "confirmado" ? `${env.appUrl}/agendamento/${data.token_publico}` : `${env.appUrl}/agendar/${ctx.tenant.slug}`,
   };
 
-  const envio = await enviarWhatsapp({
+  const envio = await notificar({
     telefone: data.whatsapp,
     mensagem: status === "confirmado" ? mensagemAgendamentoConfirmado(dados) : mensagemAgendamentoCancelado(dados),
   });
 
-  return sucesso(null, envio.enviado ? undefined : "Atualizado, mas o WhatsApp não foi enviado ao cliente.");
+  return envio.enviado ? sucesso(null) : sucesso(null, avisoNotificacao(envio), envio.link);
 }
 
 const hora = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);

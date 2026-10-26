@@ -6,7 +6,7 @@ import { env } from "@/lib/env";
 import { obterContexto } from "@/lib/sessao";
 import { formatarPlaca } from "@/lib/placa";
 import { falha, sucesso, traduzirErroBanco, type Resultado } from "@/lib/resultado";
-import { enviarWhatsapp, mensagemEntrada, mensagemStatus } from "@/lib/whatsapp";
+import { avisoNotificacao, mensagemEntrada, mensagemStatus, notificar } from "@/lib/whatsapp";
 import { STATUS_OS, type OrdemServico, type StatusOS } from "@/types/database.types";
 
 const BUCKET = "vistorias";
@@ -160,11 +160,10 @@ export async function criarOrdemServico(formData: FormData): Promise<Resultado<O
   revalidatePath("/painel", "layout");
 
   const notificacao = await dadosNotificacao(ctx, os);
-  const envio = notificacao
-    ? await enviarWhatsapp({ telefone: notificacao.telefone, mensagem: mensagemEntrada(notificacao.dados) })
-    : { enviado: false as const, motivo: "cliente_nao_encontrado" };
+  if (!notificacao) return sucesso(os, "OS criada, mas o cliente não foi encontrado para aviso.");
 
-  return sucesso(os, envio.enviado ? undefined : "OS criada, mas o WhatsApp de entrada não foi enviado.");
+  const envio = await notificar({ telefone: notificacao.telefone, mensagem: mensagemEntrada(notificacao.dados) });
+  return envio.enviado ? sucesso(os) : sucesso(os, avisoNotificacao(envio), envio.link);
 }
 
 const esquemaStatus = z.object({
@@ -194,10 +193,10 @@ export async function atualizarStatusOS(osId: string, status: StatusOS): Promise
   const notificacao = await dadosNotificacao(ctx, os);
   if (!notificacao) return sucesso(os, "Status atualizado, mas o cliente não foi encontrado para aviso.");
 
-  const envio = await enviarWhatsapp({
+  const envio = await notificar({
     telefone: notificacao.telefone,
     mensagem: mensagemStatus(os.status, notificacao.dados),
   });
 
-  return sucesso(os, envio.enviado ? undefined : "Status atualizado, mas o WhatsApp não foi enviado.");
+  return envio.enviado ? sucesso(os) : sucesso(os, avisoNotificacao(envio), envio.link);
 }

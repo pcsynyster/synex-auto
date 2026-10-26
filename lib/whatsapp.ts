@@ -9,6 +9,8 @@ type EnvioWhatsapp = {
 
 type ResultadoEnvio = { enviado: true } | { enviado: false; motivo: string };
 
+export type Notificacao = { enviado: true } | { enviado: false; automatico: boolean; link: string };
+
 const TIMEOUT_MS = 8000;
 
 function provedorAtual(): Provedor | null {
@@ -63,6 +65,24 @@ export async function enviarWhatsapp(envio: EnvioWhatsapp): Promise<ResultadoEnv
   } catch {
     return { enviado: false, motivo: "falha_rede" };
   }
+}
+
+export function linkConversa(telefone: string, mensagem: string): string {
+  return `https://wa.me/${telefone.replace(/\D/g, "")}?text=${encodeURIComponent(mensagem)}`;
+}
+
+export async function notificar(envio: EnvioWhatsapp): Promise<Notificacao> {
+  const resultado = await enviarWhatsapp(envio);
+  if (resultado.enviado) return resultado;
+  return {
+    enviado: false,
+    automatico: resultado.motivo !== "provedor_nao_configurado" && resultado.motivo !== "credenciais_ausentes",
+    link: linkConversa(envio.telefone, envio.mensagem),
+  };
+}
+
+export function avisoNotificacao(notificacao: Notificacao): string | undefined {
+  return !notificacao.enviado && notificacao.automatico ? "O envio automático falhou. Use o botão para mandar pelo seu WhatsApp." : undefined;
 }
 
 type DadosMensagem = {

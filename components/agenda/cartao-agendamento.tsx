@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { atualizarStatusAgendamento } from "@/app/actions/agenda";
+import { BotaoWhatsapp } from "@/components/ui/botao-whatsapp";
 import { ROTULO_STATUS_AGENDAMENTO } from "@/lib/agenda";
 import { horaNoFuso } from "@/lib/datas";
 import { formatarMoeda } from "@/lib/formato";
@@ -35,6 +36,7 @@ export function CartaoAgendamento(props: Props) {
   const { id, nome_cliente, whatsapp, placa, modelo, servico_nome, preco, inicio, fim, status, observacoes, fuso } = props;
   const [confirmar, setConfirmar] = useState<Acao | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [linkAviso, setLinkAviso] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
   const encerrado = status === "cancelado" || status === "nao_compareceu" || status === "concluido";
 
@@ -43,8 +45,9 @@ export function CartaoAgendamento(props: Props) {
     iniciar(async () => {
       const resultado = await atualizarStatusAgendamento(id, acao);
       setConfirmar(null);
-      if (!resultado.ok) setAviso(resultado.erro);
-      else if (resultado.aviso) setAviso(resultado.aviso);
+      if (!resultado.ok) return setAviso(resultado.erro);
+      if (resultado.aviso) setAviso(resultado.aviso);
+      setLinkAviso(resultado.whatsapp ?? null);
     });
   }
 
@@ -80,6 +83,14 @@ export function CartaoAgendamento(props: Props) {
       </div>
 
       {aviso && <p className="text-xs text-alerta">{aviso}</p>}
+
+      {linkAviso && (
+        <BotaoWhatsapp
+          link={linkAviso}
+          rotulo={status === "cancelado" ? "Avisar cancelamento no WhatsApp" : "Enviar confirmação no WhatsApp"}
+          aoClicar={() => setLinkAviso(null)}
+        />
+      )}
 
       {confirmar ? (
         <div className="grid grid-cols-2 gap-2">

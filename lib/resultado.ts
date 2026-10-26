@@ -1,7 +1,7 @@
-export type Resultado<T> = { ok: true; dados: T; aviso?: string } | { ok: false; erro: string };
+export type Resultado<T> = { ok: true; dados: T; aviso?: string; whatsapp?: string } | { ok: false; erro: string };
 
-export function sucesso<T>(dados: T, aviso?: string): Resultado<T> {
-  return aviso ? { ok: true, dados, aviso } : { ok: true, dados };
+export function sucesso<T>(dados: T, aviso?: string, whatsapp?: string): Resultado<T> {
+  return { ok: true, dados, ...(aviso ? { aviso } : {}), ...(whatsapp ? { whatsapp } : {}) };
 }
 
 export function falha<T = never>(erro: string): Resultado<T> {
