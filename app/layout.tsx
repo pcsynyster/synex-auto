@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "Synex Auto", template: "%s | Synex Auto" },
-  description: "Ordens de serviço, vistoria fotográfica e planos mensais para estética automotiva.",
+  description: "Sistema para estéticas automotivas e lava-jatos: ordens de serviço, vistoria com fotos, agenda online e planos mensais.",
   applicationName: "Synex Auto",
   appleWebApp: { capable: true, title: "Synex Auto", statusBarStyle: "black-translucent" },
 };

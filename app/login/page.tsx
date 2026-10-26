@@ -13,9 +13,10 @@ export default async function PaginaLogin({ searchParams }: { searchParams: Prom
         <LogoSynex className="w-36" />
         <div className="grid gap-3">
           <p className="text-xs font-medium uppercase tracking-[0.22em] text-suave">Synex Auto</p>
-          <h1 className="texto-prata text-[1.75rem] leading-[1.15] font-semibold">
-            Entrada por placa, vistoria com foto e cliente avisado no WhatsApp.
-          </h1>
+          <h1 className="texto-prata text-[1.75rem] leading-[1.15] font-semibold">Sistema para estéticas automotivas e lava-jatos.</h1>
+          <p className="text-sm leading-relaxed text-suave">
+            Ordens de serviço, vistoria com fotos, agenda online e planos mensais em um só lugar.
+          </p>
         </div>
       </div>
       <FormAcesso voltar={voltar ?? "/painel"} />
