@@ -14,7 +14,7 @@ export type OSPublica = {
   prontoEm: string | null;
   entregueEm: string | null;
   veiculo: { placa: string; modelo: string };
-  empresa: { nome: string; telefone: string; cidade: string | null; chavePix: string | null };
+  empresa: { nome: string; slug: string; logoVersao: number | null; telefone: string; cidade: string | null; chavePix: string | null };
 };
 
 function lerServicos(valor: unknown): ServicoAvulso[] {
@@ -35,7 +35,7 @@ export async function buscarOSPublica(token: string): Promise<OSPublica | null> 
   const { data } = await criarClientePorToken(token)
     .from("ordens_servico")
     .select(
-      "status, fotos_vistoria, servicos_avulsos, valor_total, criado_em, atualizado_em, pronto_em, entregue_em, veiculos(placa, modelo), tenants(nome, telefone, cidade, chave_pix)",
+      "status, fotos_vistoria, servicos_avulsos, valor_total, criado_em, atualizado_em, pronto_em, entregue_em, veiculos(placa, modelo), tenants(nome, slug, logo_versao, telefone, cidade, chave_pix)",
     )
     .eq("token_publico", token)
     .maybeSingle();
@@ -54,6 +54,8 @@ export async function buscarOSPublica(token: string): Promise<OSPublica | null> 
     veiculo: { placa: data.veiculos.placa, modelo: data.veiculos.modelo },
     empresa: {
       nome: data.tenants.nome,
+      slug: data.tenants.slug,
+      logoVersao: data.tenants.logo_versao,
       telefone: data.tenants.telefone,
       cidade: data.tenants.cidade,
       chavePix: data.tenants.chave_pix,

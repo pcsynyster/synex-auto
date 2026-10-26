@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buscarOSPublica } from "@/lib/os-publica";
+import { imagensCompartilhamento, urlLogo } from "@/lib/logo";
+import { LogoLoja } from "@/components/ui/logo-loja";
 import { formatarPlaca } from "@/lib/placa";
 import { normalizarWhatsapp } from "@/lib/telefone";
 import { gerarPixCopiaECola } from "@/lib/pix";
@@ -12,10 +14,18 @@ import { SimboloSynex } from "@/components/ui/marca";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Acompanhe seu veículo",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({ params }: { params: Promise<{ token: string }> }): Promise<Metadata> {
+  const os = await buscarOSPublica((await params).token);
+  if (!os) return { title: "Acompanhe seu veículo", robots: { index: false, follow: false } };
+  const titulo = `${os.empresa.nome} · Acompanhe seu veículo`;
+  const descricao = `Status do seu ${os.veiculo.modelo} (${formatarPlaca(os.veiculo.placa)}), fotos da vistoria e pagamento.`;
+  return {
+    title: { absolute: titulo },
+    description: descricao,
+    robots: { index: false, follow: false },
+    openGraph: { title: titulo, description: descricao, siteName: os.empresa.nome, images: imagensCompartilhamento(os.empresa.slug, os.empresa.logoVersao, os.empresa.nome) },
+  };
+}
 
 export default async function PaginaOSPublica({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -39,9 +49,12 @@ export default async function PaginaOSPublica({ params }: { params: Promise<{ to
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
       <header className="flex items-center justify-between">
-        <div>
+        <div className="flex min-w-0 items-center gap-3">
+          <LogoLoja url={urlLogo(os.empresa.slug, os.empresa.logoVersao)} nome={os.empresa.nome} />
+          <div className="min-w-0">
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-suave">Acompanhamento</p>
           <h1 className="mt-0.5 text-xl font-semibold">{os.empresa.nome}</h1>
+          </div>
         </div>
         <a
           href={whatsappEmpresa}

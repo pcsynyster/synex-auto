@@ -10,6 +10,8 @@ export type ServicoPublico = {
 
 export type AgendaPublica = {
   nome: string;
+  slug: string;
+  logo_versao: number | null;
   cidade: string | null;
   telefone: string;
   fuso: string;
@@ -34,6 +36,7 @@ export type AgendamentoPublico = {
   telefone_empresa: string;
   cidade: string | null;
   slug: string;
+  logo_versao: number | null;
   fuso: string;
   pode_cancelar: boolean;
 };

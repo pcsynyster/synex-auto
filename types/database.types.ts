@@ -24,6 +24,7 @@ export type Database = {
           antecedencia_min_horas: number;
           janela_dias: number;
           valor_mensal: number;
+          logo_versao: number | null;
           criado_em: string;
           atualizado_em: string;
         };
@@ -442,6 +443,18 @@ export type Database = {
         };
         Returns: Database["public"]["Tables"]["ordens_servico"]["Row"];
       };
+      logo_por_slug: {
+        Args: { p_slug: string };
+        Returns: { conteudo: string; tipo: string }[];
+      };
+      salvar_logo: {
+        Args: { p_tenant: string; p_conteudo: string; p_tipo: string };
+        Returns: number;
+      };
+      remover_logo: {
+        Args: { p_tenant: string };
+        Returns: undefined;
+      };
       eh_admin: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
@@ -458,6 +471,7 @@ export type Database = {
           status_assinatura: Database["public"]["Enums"]["status_assinatura_tenant"];
           assinatura_valida_ate: string;
           valor_mensal: number;
+          logo_versao: number | null;
           criado_em: string;
           total_os: number;
           os_30_dias: number;

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { Bloqueios } from "@/components/agenda/bloqueios";
 import { FormConfigAgenda } from "@/components/agenda/form-config";
 import { ListaServicos } from "@/components/agenda/lista-servicos";
+import { EnviarLogo } from "@/components/ui/enviar-logo";
+import { urlLogo } from "@/lib/logo";
 import { dataNoFuso, hojeNoFuso } from "@/lib/datas";
 import { obterContexto } from "@/lib/sessao";
 import type { ConfigAgenda } from "@/app/actions/agenda";
@@ -19,7 +21,7 @@ export default async function PaginaConfigAgenda() {
   const [{ data: tenant }, { data: horarios }, { data: servicos }, { data: bloqueios }] = await Promise.all([
     ctx.supabase
       .from("tenants")
-      .select("agenda_ativa, confirmacao_automatica, intervalo_agenda_min, capacidade_simultanea, antecedencia_min_horas, janela_dias")
+      .select("slug, logo_versao, agenda_ativa, confirmacao_automatica, intervalo_agenda_min, capacidade_simultanea, antecedencia_min_horas, janela_dias")
       .eq("id", ctx.tenantId)
       .single(),
     ctx.supabase.from("horarios_funcionamento").select("dia_semana, abre, fecha, ativo"),
@@ -55,6 +57,10 @@ export default async function PaginaConfigAgenda() {
           Voltar
         </Link>
       </div>
+      <section className="cartao p-4">
+        <h2 className="mb-3 text-sm font-semibold">Logo da loja</h2>
+        <EnviarLogo logoUrl={urlLogo(tenant.slug, tenant.logo_versao)} />
+      </section>
       <FormConfigAgenda inicial={config} />
       <ListaServicos servicos={servicos ?? []} />
       <Bloqueios

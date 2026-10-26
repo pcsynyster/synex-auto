@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { definirStatusAssinatura, registrarPagamento } from "@/app/actions/admin";
+import { EnviarLogo } from "@/components/ui/enviar-logo";
 import { situacaoAssinatura } from "@/lib/assinatura";
 import { formatarMoeda } from "@/lib/formato";
 import { linkWhatsapp } from "@/lib/telefone";
@@ -43,6 +44,13 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
     <article className={`cartao grid grid-cols-1 gap-3 p-4 ${situacao.ativa ? "" : "border-alerta/40"}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
+          <div className="mb-3">
+            <EnviarLogo
+              compacto
+              tenantId={estetica.id}
+              logoUrl={estetica.logo_versao ? `${appUrl}/logo/${estetica.slug}?v=${estetica.logo_versao}` : null}
+            />
+          </div>
           <p className="truncate font-semibold">{estetica.nome}</p>
           <p className="truncate text-xs text-suave">{estetica.email_dono ?? "sem dono"}</p>
         </div>

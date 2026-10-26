@@ -10,13 +10,29 @@ import { formatarMoeda } from "@/lib/formato";
 import { formatarPlaca } from "@/lib/placa";
 import { criarClienteAnonimo } from "@/lib/supabase/anon";
 import { linkWhatsapp } from "@/lib/telefone";
+import { imagensCompartilhamento, urlLogo } from "@/lib/logo";
+import { LogoLoja } from "@/components/ui/logo-loja";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Seu agendamento",
-  robots: { index: false, follow: false },
-};
+async function carregar(token: string): Promise<AgendamentoPublico | null> {
+  if (!PADRAO_TOKEN.test(token)) return null;
+  const { data } = await criarClienteAnonimo().rpc("agendamento_publico", { p_token: token });
+  return (data as AgendamentoPublico | null) ?? null;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ token: string }> }): Promise<Metadata> {
+  const agendamento = await carregar((await params).token);
+  if (!agendamento) return { title: "Seu agendamento", robots: { index: false, follow: false } };
+  const titulo = `${agendamento.empresa} · Seu agendamento`;
+  const descricao = `${agendamento.servico} em ${rotuloDataLonga(dataNoFuso(agendamento.inicio, agendamento.fuso))}, às ${horaNoFuso(agendamento.inicio, agendamento.fuso)}.`;
+  return {
+    title: { absolute: titulo },
+    description: descricao,
+    robots: { index: false, follow: false },
+    openGraph: { title: titulo, description: descricao, siteName: agendamento.empresa, images: imagensCompartilhamento(agendamento.slug, agendamento.logo_versao, agendamento.empresa) },
+  };
+}
 
 const ESTILO_STATUS = {
   pendente: "border border-borda text-texto",
@@ -28,10 +44,7 @@ const ESTILO_STATUS = {
 
 export default async function PaginaAgendamento({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  if (!PADRAO_TOKEN.test(token)) notFound();
-
-  const { data } = await criarClienteAnonimo().rpc("agendamento_publico", { p_token: token });
-  const agendamento = data as AgendamentoPublico | null;
+  const agendamento = await carregar(token);
   if (!agendamento) notFound();
 
   const data_ = dataNoFuso(agendamento.inicio, agendamento.fuso);
@@ -39,9 +52,12 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
-      <header>
-        <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-suave">Seu agendamento</p>
-        <h1 className="mt-1 text-2xl leading-tight font-semibold">{agendamento.empresa}</h1>
+      <header className="flex items-center gap-3">
+        <LogoLoja url={urlLogo(agendamento.slug, agendamento.logo_versao)} nome={agendamento.empresa} />
+        <div className="min-w-0">
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-suave">Seu agendamento</p>
+          <h1 className="mt-1 text-2xl leading-tight font-semibold">{agendamento.empresa}</h1>
+        </div>
       </header>
 
       <section className="cartao grid grid-cols-1 gap-5 p-5">
