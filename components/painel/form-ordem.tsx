@@ -84,7 +84,7 @@ export function FormOrdem({ veiculoId, temPlano, agendamentoId, servicosIniciais
             Copiar link
           </Botao>
           <Botao type="button" onClick={() => window.location.assign("/painel")}>
-            Ir para o pátio
+            Ir para serviços
           </Botao>
         </div>
       </section>

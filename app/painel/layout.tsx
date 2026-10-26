@@ -60,7 +60,7 @@ export default async function LayoutPainel({ children }: { children: React.React
           <p className="text-xs text-suave">
             {situacao.ativa
               ? "Fale com a Synex para ativar a mensalidade e continuar usando sem interrupção."
-              : "Você ainda consulta o pátio, mas não abre novas OS e a agenda online fica fechada para clientes. Regularize para voltar ao normal."}
+              : "Você ainda consulta os serviços, mas não abre novas OS e a agenda online fica fechada para clientes. Regularize para voltar ao normal."}
           </p>
           <a
             href={linkWhatsapp(WHATSAPP_SYNEX, `Olá! Quero ${situacao.ativa ? "ativar" : "renovar"} a mensalidade da Synex Auto da ${ctx.tenant.nome}.`)}

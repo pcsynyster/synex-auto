@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const ABAS = [
-  { href: "/painel", rotulo: "Pátio", ativa: (caminho: string) => caminho === "/painel" || caminho.startsWith("/painel/nova") },
+  { href: "/painel", rotulo: "Serviços", ativa: (caminho: string) => caminho === "/painel" || caminho.startsWith("/painel/nova") },
   { href: "/painel/agenda", rotulo: "Agenda", ativa: (caminho: string) => caminho.startsWith("/painel/agenda") },
 ];
 

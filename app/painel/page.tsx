@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { CartaoOS } from "@/components/painel/cartao-os";
 import { obterContexto } from "@/lib/sessao";
 
-export const metadata: Metadata = { title: "Pátio" };
+export const metadata: Metadata = { title: "Serviços" };
 
 export default async function PaginaPainel() {
   const ctx = await obterContexto();
@@ -22,7 +22,7 @@ export default async function PaginaPainel() {
     .limit(100);
 
   const lista = ordens ?? [];
-  const noPatio = lista.filter((os) => os.status !== "entregue").length;
+  const emAndamento = lista.filter((os) => os.status !== "entregue").length;
 
   return (
     <div className="grid gap-4">
@@ -34,13 +34,13 @@ export default async function PaginaPainel() {
       </Link>
 
       <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold">Pátio hoje</h1>
-        <span className="rounded-full border border-borda px-2.5 py-1 text-xs text-suave">{noPatio} em andamento</span>
+        <h1 className="text-xl font-semibold">Serviços de hoje</h1>
+        <span className="rounded-full border border-borda px-2.5 py-1 text-xs text-suave">{emAndamento} em andamento</span>
       </div>
 
       {lista.length === 0 ? (
         <p className="rounded-[1.25rem] border border-dashed border-borda p-8 text-center text-sm text-suave">
-          Nenhum veículo no pátio. Registre a primeira entrada.
+          Nenhum serviço em andamento. Registre a primeira entrada.
         </p>
       ) : (
         <ul className="grid gap-3">
