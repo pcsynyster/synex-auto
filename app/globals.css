@@ -59,3 +59,19 @@
     @apply outline-2 outline-offset-2 outline-texto;
   }
 }
+
+@layer base {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-texto);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-elevado) inset;
+    caret-color: var(--color-texto);
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  input:autofill {
+    background-color: var(--color-elevado);
+    color: var(--color-texto);
+  }
+}
