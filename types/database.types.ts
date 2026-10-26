@@ -455,6 +455,14 @@ export type Database = {
         Args: { p_tenant: string };
         Returns: undefined;
       };
+      alterar_slug: {
+        Args: { p_tenant: string; p_slug: string };
+        Returns: string;
+      };
+      slug_atual: {
+        Args: { p_slug: string };
+        Returns: string | null;
+      };
       eh_admin: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;

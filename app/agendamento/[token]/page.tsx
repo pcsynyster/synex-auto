@@ -118,7 +118,7 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
         {agendamento.pode_cancelar && <CancelarAgendamento token={token} />}
         {!ativo && (
           <Link
-            href={`/agendar/${agendamento.slug}`}
+            href={`/${agendamento.slug}`}
             className="flex h-12 items-center justify-center rounded-full bg-texto text-sm font-semibold text-fundo"
           >
             Agendar novo horário

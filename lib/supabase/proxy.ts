@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database.types";
 
+const ROTAS_PRIVADAS = ["/painel", "/admin"];
 const ROTAS_PUBLICAS = ["/login", "/os", "/api/os", "/agendar", "/agendamento", "/logo", "/manifest.webmanifest", "/brand"];
 
 export async function atualizarSessao(request: NextRequest) {
@@ -26,7 +27,8 @@ export async function atualizarSessao(request: NextRequest) {
 
   const { data } = await supabase.auth.getClaims();
   const caminho = request.nextUrl.pathname;
-  const publica = caminho === "/" || ROTAS_PUBLICAS.some((rota) => caminho === rota || caminho.startsWith(`${rota}/`));
+  const linkCurto = /^\/[a-z0-9]+(-[a-z0-9]+)*$/.test(caminho) && !ROTAS_PRIVADAS.includes(caminho);
+  const publica = caminho === "/" || linkCurto || ROTAS_PUBLICAS.some((rota) => caminho === rota || caminho.startsWith(`${rota}/`));
 
   if (!data?.claims && !publica) {
     const url = request.nextUrl.clone();

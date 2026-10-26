@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CartaoAgendamento } from "@/components/agenda/cartao-agendamento";
-import { CopiarLink } from "@/components/agenda/copiar-link";
+import { EditarLink } from "@/components/agenda/editar-link";
 import { env } from "@/lib/env";
 import { dataNoFuso, dataValida, diaDoMes, hojeNoFuso, limitesDoDia, rotuloDataLonga, rotuloDiaCurto, somarDias } from "@/lib/datas";
 import { obterContexto } from "@/lib/sessao";
@@ -50,7 +50,6 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
 
   const lista = agendamentos ?? [];
   const ativos = lista.filter((item) => item.status === "pendente" || item.status === "confirmado");
-  const link = `${env.appUrl}/agendar/${ctx.tenant.slug}`;
 
   return (
     <div className="grid grid-cols-1 gap-5">
@@ -70,12 +69,7 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
               : "Coloque na bio do Instagram e no status do WhatsApp."}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <a href={link} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate rounded-full border border-borda bg-black/40 px-4 py-2.5 font-mono text-xs text-suave">
-            {link.replace(/^https?:\/\//, "")}
-          </a>
-          <CopiarLink link={link} />
-        </div>
+        <EditarLink appUrl={env.appUrl} slug={ctx.tenant.slug} sugestao={ctx.tenant.nome} />
       </section>
 
       <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">

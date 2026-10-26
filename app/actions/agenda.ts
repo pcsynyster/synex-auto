@@ -49,7 +49,7 @@ export async function atualizarStatusAgendamento(
     servico: data.servico_nome,
     quando: `${rotuloDataLonga(dataNoFuso(data.inicio, fuso))}, às ${horaNoFuso(data.inicio, fuso)}`,
     placa: null,
-    link: status === "confirmado" ? `${env.appUrl}/agendamento/${data.token_publico}` : `${env.appUrl}/agendar/${ctx.tenant.slug}`,
+    link: status === "confirmado" ? `${env.appUrl}/agendamento/${data.token_publico}` : `${env.appUrl}/${ctx.tenant.slug}`,
   };
 
   const envio = await notificar({

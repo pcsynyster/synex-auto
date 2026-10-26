@@ -1,5 +1,6 @@
 "use client";
 
+import { EditarLink } from "@/components/agenda/editar-link";
 import { useState, useTransition } from "react";
 import { definirStatusAssinatura, registrarPagamento } from "@/app/actions/admin";
 import { EnviarLogo } from "@/components/ui/enviar-logo";
@@ -63,6 +64,8 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
         </span>
       </div>
 
+      <EditarLink appUrl={appUrl} slug={estetica.slug} sugestao={estetica.nome} tenantId={estetica.id} compacto />
+
       <dl className="grid grid-cols-3 gap-2 border-t border-borda pt-3 text-center">
         <div>
           <dt className="text-[11px] text-suave">Vencimento</dt>
@@ -115,7 +118,7 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
               Cobrar
             </a>
             <a
-              href={`${appUrl}/agendar/${estetica.slug}`}
+              href={`${appUrl}/${estetica.slug}`}
               target="_blank"
               rel="noreferrer"
               className="flex h-10 items-center justify-center rounded-full border border-borda text-xs"

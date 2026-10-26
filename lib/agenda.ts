@@ -51,3 +51,17 @@ export const ROTULO_STATUS_AGENDAMENTO: Record<StatusAgendamento, string> = {
 
 export const PADRAO_TOKEN = /^[a-f0-9]{48}$/;
 export const PADRAO_SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+export function linkAgenda(appUrl: string, slug: string): string {
+  return `${appUrl}/${slug}`;
+}
+
+export function sugerirSlug(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}

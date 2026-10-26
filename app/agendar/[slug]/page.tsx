@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { AgendarCliente } from "@/components/agenda/agendar-cliente";
 import { RodapeSynex } from "@/components/ui/rodape-synex";
 import { PADRAO_SLUG, type AgendaPublica } from "@/lib/agenda";
@@ -31,7 +31,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function PaginaAgendar({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const agenda = await carregarAgenda(slug);
-  if (!agenda) notFound();
+  if (!agenda) {
+    const atual = PADRAO_SLUG.test(slug) ? (await criarClienteAnonimo().rpc("slug_atual", { p_slug: slug })).data : null;
+    if (atual) permanentRedirect(`/${atual}`);
+    notFound();
+  }
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
