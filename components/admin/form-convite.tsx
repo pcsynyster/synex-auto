@@ -20,7 +20,7 @@ export function FormConvite() {
         email,
         nomeEmpresa: String(formData.get("nome_empresa") ?? ""),
         diasTeste: Number(formData.get("dias_teste") ?? 14),
-        valorMensal: Number(String(formData.get("valor_mensal") ?? "149").replace(",", ".")),
+        valorMensal: Number(String(formData.get("valor_mensal") ?? "99").replace(",", ".")),
       });
       if (!resultado.ok) return setErro(resultado.erro);
       setOk(`Convite criado para ${email.trim().toLowerCase()}. Envie o link abaixo.`);
@@ -39,7 +39,7 @@ export function FormConvite() {
         <Campo rotulo="Nome da estética (opcional)" name="nome_empresa" autoComplete="off" />
         <div className="grid grid-cols-2 gap-3">
           <Campo rotulo="Dias de teste" name="dias_teste" type="number" min={0} max={90} defaultValue={14} inputMode="numeric" />
-          <Campo rotulo="Mensalidade (R$)" name="valor_mensal" defaultValue="149" inputMode="decimal" />
+          <Campo rotulo="Mensalidade (R$)" name="valor_mensal" defaultValue="99" inputMode="decimal" />
         </div>
         {erro && <p className="text-sm text-alerta">{erro}</p>}
         {ok && <p className="text-sm text-texto">{ok}</p>}
