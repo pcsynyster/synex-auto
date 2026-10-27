@@ -122,3 +122,21 @@ export async function editarVeiculoCliente(dados: DadosVeiculo): Promise<Resulta
   revalidatePath("/painel", "layout");
   return sucesso(null);
 }
+
+export async function excluirOrdemServico(osId: string): Promise<Resultado<null>> {
+  const ctx = await obterContexto();
+  if (!ctx) return falha("Sessão expirada. Entre novamente.");
+  if (!z.uuid().safeParse(osId).success) return falha("Dados inválidos.");
+  if (ctx.papel !== "dono") return falha("Só o dono da loja pode excluir uma OS.");
+
+  const { data: fotos, error } = await ctx.supabase.rpc("excluir_ordem_servico", { p_os_id: osId });
+  if (error) return falha(error.message === "os_inexistente" ? "Essa OS já foi excluída." : "Não foi possível excluir a OS.");
+
+  const caminhos = (fotos ?? [])
+    .map(caminhoDaUrl)
+    .filter((caminho): caminho is string => caminho !== null && caminho.startsWith(`${ctx.tenantId}/`));
+  if (caminhos.length) await ctx.supabase.storage.from(BUCKET).remove(caminhos);
+
+  revalidatePath("/painel", "layout");
+  return sucesso(null);
+}

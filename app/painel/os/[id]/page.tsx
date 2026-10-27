@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { EditarOrdem } from "@/components/painel/editar-ordem";
 import { EditarVeiculo } from "@/components/painel/editar-veiculo";
+import { ExcluirOrdem } from "@/components/painel/excluir-ordem";
 import { formatarPlaca } from "@/lib/placa";
 import { ROTULO_STATUS } from "@/lib/os-status";
 import { obterContexto } from "@/lib/sessao";
@@ -76,6 +77,8 @@ export default async function PaginaEditarOS({ params }: { params: Promise<{ id:
         observacoes={os.observacoes ?? ""}
         usouPlano={os.plano_assinatura_id !== null}
       />
+
+      {ctx.papel === "dono" && <ExcluirOrdem osId={os.id} placa={formatarPlaca(veiculo.placa)} />}
     </div>
   );
 }
