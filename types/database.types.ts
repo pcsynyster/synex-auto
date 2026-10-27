@@ -14,6 +14,7 @@ export type Database = {
           slug: string;
           cidade: string | null;
           chave_pix: string | null;
+          pix_titular: string | null;
           status_assinatura: Database["public"]["Enums"]["status_assinatura_tenant"];
           assinatura_valida_ate: string;
           fuso: string;
@@ -35,6 +36,7 @@ export type Database = {
           slug: string;
           cidade?: string | null;
           chave_pix?: string | null;
+          pix_titular?: string | null;
           status_assinatura?: Database["public"]["Enums"]["status_assinatura_tenant"];
           assinatura_valida_ate?: string;
           criado_em?: string;
@@ -45,6 +47,7 @@ export type Database = {
           telefone?: string;
           cidade?: string | null;
           chave_pix?: string | null;
+          pix_titular?: string | null;
           agenda_ativa?: boolean;
           confirmacao_automatica?: boolean;
           intervalo_agenda_min?: number;

@@ -33,6 +33,16 @@ export default async function PaginaPainel() {
         Nova entrada por placa
       </Link>
 
+      {!ctx.tenant.chave_pix && ctx.papel === "dono" && (
+        <Link href="/painel/agenda/config#pix" className="flex items-center justify-between gap-3 rounded-2xl border border-borda bg-elevado/60 px-4 py-3">
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold">Cadastre seu Pix</span>
+            <span className="block text-xs text-suave">Ele vai junto quando você avisar que o carro está pronto.</span>
+          </span>
+          <span className="shrink-0 rounded-full bg-texto px-3.5 py-1.5 text-xs font-semibold text-fundo">Cadastrar</span>
+        </Link>
+      )}
+
       <div className="flex items-baseline justify-between">
         <h1 className="text-xl font-semibold">Serviços de hoje</h1>
         <span className="rounded-full border border-borda px-2.5 py-1 text-xs text-suave">{emAndamento} em andamento</span>

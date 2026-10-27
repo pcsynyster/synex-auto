@@ -5,12 +5,13 @@ import { Bloqueios } from "@/components/agenda/bloqueios";
 import { FormConfigAgenda } from "@/components/agenda/form-config";
 import { ListaServicos } from "@/components/agenda/lista-servicos";
 import { EnviarLogo } from "@/components/ui/enviar-logo";
+import { FormPix } from "@/components/painel/form-pix";
 import { urlLogo } from "@/lib/logo";
 import { dataNoFuso, hojeNoFuso } from "@/lib/datas";
 import { obterContexto } from "@/lib/sessao";
 import type { ConfigAgenda } from "@/app/actions/agenda";
 
-export const metadata: Metadata = { title: "Horários e serviços" };
+export const metadata: Metadata = { title: "Configurações da loja" };
 
 const HORARIO_PADRAO = { abre: "08:00", fecha: "18:00", ativo: false };
 
@@ -52,7 +53,7 @@ export default async function PaginaConfigAgenda() {
   return (
     <div className="grid grid-cols-1 gap-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Horários e serviços</h1>
+        <h1 className="text-xl font-semibold">Configurações da loja</h1>
         <Link href="/painel/agenda" className="text-xs text-suave">
           Voltar
         </Link>
@@ -60,6 +61,11 @@ export default async function PaginaConfigAgenda() {
       <section className="cartao p-4">
         <h2 className="mb-3 text-sm font-semibold">Logo da loja</h2>
         <EnviarLogo logoUrl={urlLogo(tenant.slug, tenant.logo_versao)} />
+      </section>
+      <section id="pix" className="cartao scroll-mt-40 p-4">
+        <h2 className="text-sm font-semibold">Pix para pagamento</h2>
+        <p className="mt-1 mb-3 text-xs text-suave">Vai na mensagem de carro pronto, com o valor do serviço, e no link do cliente com o Pix copia e cola.</p>
+        <FormPix chave={ctx.tenant.chave_pix} titular={ctx.tenant.pix_titular} />
       </section>
       <FormConfigAgenda inicial={config} />
       <ListaServicos servicos={servicos ?? []} />

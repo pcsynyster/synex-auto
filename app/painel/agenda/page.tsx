@@ -56,7 +56,7 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Agenda</h1>
         <Link href="/painel/agenda/config" className="rounded-full border border-borda px-3.5 py-1.5 text-xs text-texto hover:border-prata/60">
-          Horários e serviços
+          Configurações
         </Link>
       </div>
 
@@ -65,7 +65,7 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
           <p className="text-sm font-semibold">Link de agendamento</p>
           <p className="mt-0.5 text-xs text-suave">
             {tenant?.agenda_ativa === false
-              ? "A agenda online está desligada. Ative em Horários e serviços."
+              ? "A agenda online está desligada. Ative em Configurações."
               : "Coloque na bio do Instagram e no status do WhatsApp."}
           </p>
         </div>

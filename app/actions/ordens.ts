@@ -5,6 +5,8 @@ import { z } from "zod";
 import { env } from "@/lib/env";
 import { obterContexto } from "@/lib/sessao";
 import { formatarPlaca } from "@/lib/placa";
+import { formatarMoeda } from "@/lib/formato";
+import { exibirChavePix } from "@/lib/chave-pix";
 import { falha, sucesso, traduzirErroBanco, type Resultado } from "@/lib/resultado";
 import { avisoNotificacao, mensagemEntrada, mensagemStatus, notificar } from "@/lib/whatsapp";
 import { STATUS_OS, type OrdemServico, type StatusOS } from "@/types/database.types";
@@ -193,9 +195,14 @@ export async function atualizarStatusOS(osId: string, status: StatusOS): Promise
   const notificacao = await dadosNotificacao(ctx, os);
   if (!notificacao) return sucesso(os, "Status atualizado, mas o cliente não foi encontrado para aviso.");
 
+  const pagamento =
+    os.status === "pronto" && ctx.tenant.chave_pix && Number(os.valor_total) > 0
+      ? { valor: formatarMoeda(Number(os.valor_total)), chave: exibirChavePix(ctx.tenant.chave_pix), titular: ctx.tenant.pix_titular }
+      : null;
+
   const envio = await notificar({
     telefone: notificacao.telefone,
-    mensagem: mensagemStatus(os.status, notificacao.dados),
+    mensagem: mensagemStatus(os.status, { ...notificacao.dados, pagamento }),
   });
 
   return envio.enviado ? sucesso(os) : sucesso(os, avisoNotificacao(envio), envio.link);

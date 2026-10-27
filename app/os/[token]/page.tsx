@@ -37,7 +37,7 @@ export default async function PaginaOSPublica({ params }: { params: Promise<{ to
     os.empresa.chavePix && os.valorTotal > 0
       ? gerarPixCopiaECola({
           chave: os.empresa.chavePix,
-          recebedor: os.empresa.nome,
+          recebedor: os.empresa.pixTitular ?? os.empresa.nome,
           cidade: os.empresa.cidade,
           valor: os.valorTotal,
           identificador: `OS${token.slice(0, 20)}`,

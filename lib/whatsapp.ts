@@ -90,6 +90,7 @@ type DadosMensagem = {
   cliente: string;
   placa: string;
   link: string;
+  pagamento?: { valor: string; chave: string; titular: string | null } | null;
 };
 
 export function mensagemEntrada({ empresa, cliente, placa, link }: DadosMensagem): string {
@@ -107,6 +108,15 @@ export function mensagemStatus(status: "lavando" | "acabamento" | "pronto" | "en
     pronto: `Seu veículo ${dados.placa} está pronto para retirada na ${dados.empresa}.`,
     entregue: `Veículo ${dados.placa} entregue. Obrigado pela preferência, ${dados.cliente}!`,
   };
+  if (status === "pronto" && dados.pagamento) {
+    const { valor, chave, titular } = dados.pagamento;
+    return [
+      textos.pronto,
+      `Valor: ${valor}`,
+      ["Pague pelo Pix:", `Chave: ${chave}`, titular ? `Titular: ${titular}` : ""].filter(Boolean).join("\n"),
+      `Ou copie o Pix com o valor pronto no link: ${dados.link}`,
+    ].join("\n\n");
+  }
   return [textos[status], `Acompanhe: ${dados.link}`].join("\n\n");
 }
 
