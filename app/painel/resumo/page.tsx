@@ -199,7 +199,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
               veiculos: { placa: string; modelo: string; clientes: { nome: string } | null } | null;
             }[]).map((os) => (
               <li key={os.id}>
-                <a href={`/os/${os.token_publico}`} target="_blank" rel="noreferrer" className="flex min-w-0 items-center justify-between gap-3 px-4 py-3">
+                <Link href={`/painel/os/${os.id}`} className="flex min-w-0 items-center justify-between gap-3 px-4 py-3">
                   <span className="min-w-0">
                     <span className="flex items-center gap-2">
                       <span className="rounded bg-texto px-1.5 py-0.5 font-mono text-[11px] font-bold tracking-widest text-fundo">
@@ -214,7 +214,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
                   <span className="shrink-0 text-right text-sm font-semibold tabular-nums">
                     {os.plano_assinatura_id && Number(os.valor_total) === 0 ? "Plano" : formatarMoeda(Number(os.valor_total))}
                   </span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

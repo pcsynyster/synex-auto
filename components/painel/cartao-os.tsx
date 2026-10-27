@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { atualizarStatusOS } from "@/app/actions/ordens";
 import { BotaoWhatsapp } from "@/components/ui/botao-whatsapp";
@@ -54,9 +55,14 @@ export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, uso
 
       <div className="mt-3 flex items-center justify-between text-xs text-suave">
         <span>{usouPlano ? (valor > 0 ? `Plano + ${formatarMoeda(valor)}` : "Crédito do plano") : formatarMoeda(valor)}</span>
-        <a href={`/os/${token}`} target="_blank" rel="noreferrer" className="underline underline-offset-4">
-          Link do cliente
-        </a>
+        <span className="flex items-center gap-4">
+          <Link href={`/painel/os/${id}`} className="font-semibold text-texto underline underline-offset-4">
+            Editar
+          </Link>
+          <a href={`/os/${token}`} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+            Link do cliente
+          </a>
+        </span>
       </div>
 
       {aviso && <p className="mt-2 text-xs text-alerta">{aviso}</p>}
