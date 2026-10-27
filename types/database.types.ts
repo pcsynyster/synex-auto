@@ -466,10 +466,6 @@ export type Database = {
         Args: { p_inicio: string; p_fim: string; p_agrupar?: string };
         Returns: Json;
       };
-      excluir_ordem_servico: {
-        Args: { p_os_id: string };
-        Returns: string[];
-      };
       slug_atual: {
         Args: { p_slug: string };
         Returns: string | null;

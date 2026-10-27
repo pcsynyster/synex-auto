@@ -129,10 +129,37 @@ export async function excluirOrdemServico(osId: string): Promise<Resultado<null>
   if (!z.uuid().safeParse(osId).success) return falha("Dados inválidos.");
   if (ctx.papel !== "dono") return falha("Só o dono da loja pode excluir uma OS.");
 
-  const { data: fotos, error } = await ctx.supabase.rpc("excluir_ordem_servico", { p_os_id: osId });
-  if (error) return falha(error.message === "os_inexistente" ? "Essa OS já foi excluída." : "Não foi possível excluir a OS.");
+  const { data: os } = await ctx.supabase.from("ordens_servico").select("id, fotos_vistoria, plano_assinatura_id").eq("id", osId).maybeSingle();
+  if (!os) return falha("Essa OS já foi excluída.");
 
-  const caminhos = (fotos ?? [])
+  await ctx.supabase
+    .from("agendamentos")
+    .update({ status: "confirmado", ordem_servico_id: null })
+    .eq("ordem_servico_id", os.id)
+    .eq("status", "concluido");
+
+  const { data: apagadas, error } = await ctx.supabase.from("ordens_servico").delete().eq("id", os.id).select("id");
+  if (error || !apagadas?.length) return falha("Não foi possível excluir a OS.");
+
+  if (os.plano_assinatura_id) {
+    const { data: plano } = await ctx.supabase
+      .from("planos_assinaturas")
+      .select("id, creditos_restantes, total_creditos, status, validade")
+      .eq("id", os.plano_assinatura_id)
+      .maybeSingle();
+    if (plano) {
+      const hoje = new Date().toISOString().slice(0, 10);
+      await ctx.supabase
+        .from("planos_assinaturas")
+        .update({
+          creditos_restantes: Math.min(plano.creditos_restantes + 1, plano.total_creditos),
+          status: plano.status === "esgotado" && plano.validade >= hoje ? "ativo" : plano.status,
+        })
+        .eq("id", plano.id);
+    }
+  }
+
+  const caminhos = os.fotos_vistoria
     .map(caminhoDaUrl)
     .filter((caminho): caminho is string => caminho !== null && caminho.startsWith(`${ctx.tenantId}/`));
   if (caminhos.length) await ctx.supabase.storage.from(BUCKET).remove(caminhos);
