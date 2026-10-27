@@ -66,6 +66,7 @@ export default async function PaginaPainel() {
                   cliente={os.veiculos.clientes?.nome ?? ""}
                   valor={Number(os.valor_total)}
                   usouPlano={os.plano_assinatura_id !== null}
+                  podeExcluir={ctx.papel === "dono"}
                 />
               </li>
             ) : null,

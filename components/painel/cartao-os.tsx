@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { atualizarStatusOS } from "@/app/actions/ordens";
+import { excluirOrdemServico } from "@/app/actions/editar";
 import { BotaoWhatsapp } from "@/components/ui/botao-whatsapp";
 import { formatarMoeda } from "@/lib/formato";
 import { formatarPlaca } from "@/lib/placa";
@@ -18,13 +19,27 @@ type CartaoOSProps = {
   cliente: string;
   valor: number;
   usouPlano: boolean;
+  podeExcluir?: boolean;
 };
 
-export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, usouPlano }: CartaoOSProps) {
+export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, usouPlano, podeExcluir = false }: CartaoOSProps) {
   const [pendente, iniciar] = useTransition();
   const [aviso, setAviso] = useState<string | null>(null);
   const [whatsapp, setWhatsapp] = useState<string | null>(null);
+  const [confirmarExclusao, setConfirmarExclusao] = useState(false);
+  const [excluida, setExcluida] = useState(false);
   const proximo = proximoStatus(status);
+
+  function excluir() {
+    setAviso(null);
+    iniciar(async () => {
+      const resultado = await excluirOrdemServico(id);
+      if (!resultado.ok) return setAviso(resultado.erro);
+      setExcluida(true);
+    });
+  }
+
+  if (excluida) return null;
 
   function avancar() {
     if (!proximo) return;
@@ -56,6 +71,11 @@ export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, uso
       <div className="mt-3 flex items-center justify-between text-xs text-suave">
         <span>{usouPlano ? (valor > 0 ? `Plano + ${formatarMoeda(valor)}` : "Crédito do plano") : formatarMoeda(valor)}</span>
         <span className="flex items-center gap-4">
+          {podeExcluir && (
+            <button type="button" onClick={() => setConfirmarExclusao(true)} className="text-alerta underline underline-offset-4">
+              Excluir
+            </button>
+          )}
           <Link href={`/painel/os/${id}`} className="font-semibold text-texto underline underline-offset-4">
             Editar
           </Link>
@@ -73,7 +93,20 @@ export function CartaoOS({ id, status, token, placa, modelo, cliente, valor, uso
         </div>
       )}
 
-      {proximo && (
+      {confirmarExclusao ? (
+        <div className="mt-3 grid gap-2 rounded-2xl border border-alerta/50 bg-alerta/10 p-3">
+          <p className="text-sm font-semibold">Excluir esta OS?</p>
+          <p className="text-xs text-suave">As fotos e os serviços somem e o link do cliente para de funcionar. Não dá para desfazer.</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" onClick={() => setConfirmarExclusao(false)} className="h-10 rounded-full border border-borda text-sm">
+              Voltar
+            </button>
+            <button type="button" onClick={excluir} disabled={pendente} className="h-10 rounded-full bg-alerta text-sm font-semibold text-fundo disabled:opacity-50">
+              {pendente ? "Excluindo..." : "Excluir"}
+            </button>
+          </div>
+        </div>
+      ) : proximo && (
         <button
           type="button"
           onClick={avancar}
