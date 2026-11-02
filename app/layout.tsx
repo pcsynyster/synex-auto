@@ -3,10 +3,10 @@ import "@fontsource-variable/inter";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Synex Auto", template: "%s | Synex Auto" },
-  description: "Sistema para estéticas automotivas e lava-jatos: ordens de serviço, vistoria com fotos, agenda online e planos mensais.",
-  applicationName: "Synex Auto",
-  appleWebApp: { capable: true, title: "Synex Auto", statusBarStyle: "black-translucent" },
+  title: { default: "Synex Agenda", template: "%s | Synex Agenda" },
+  description: "Agenda online para salões de unhas: a cliente marca pelo link, você confirma no WhatsApp e acompanha o faturamento.",
+  applicationName: "Synex Agenda",
+  appleWebApp: { capable: true, title: "Synex Agenda", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {

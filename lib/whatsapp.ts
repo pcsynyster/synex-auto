@@ -85,54 +85,19 @@ export function avisoNotificacao(notificacao: Notificacao): string | undefined {
   return !notificacao.enviado && notificacao.automatico ? "O envio automático falhou. Use o botão para mandar pelo seu WhatsApp." : undefined;
 }
 
-type DadosMensagem = {
-  empresa: string;
-  cliente: string;
-  placa: string;
-  link: string;
-  pagamento?: { valor: string; chave: string; titular: string | null } | null;
-};
-
-export function mensagemEntrada({ empresa, cliente, placa, link }: DadosMensagem): string {
-  return [
-    `Olá, ${cliente}! Seu veículo ${placa} deu entrada na ${empresa}.`,
-    "Registramos as fotos da vistoria de entrada e você pode acompanhar cada etapa pelo link:",
-    link,
-  ].join("\n\n");
-}
-
-export function mensagemStatus(status: "lavando" | "acabamento" | "pronto" | "entregue", dados: DadosMensagem): string {
-  const textos = {
-    lavando: `Seu veículo ${dados.placa} começou a ser lavado.`,
-    acabamento: `Seu veículo ${dados.placa} está na etapa de acabamento.`,
-    pronto: `Seu veículo ${dados.placa} está pronto para retirada na ${dados.empresa}.`,
-    entregue: `Veículo ${dados.placa} entregue. Obrigado pela preferência, ${dados.cliente}!`,
-  };
-  if (status === "pronto" && dados.pagamento) {
-    const { valor, chave, titular } = dados.pagamento;
-    return [
-      textos.pronto,
-      `Valor: ${valor}`,
-      ["Pague pelo Pix:", `Chave: ${chave}`, titular ? `Titular: ${titular}` : ""].filter(Boolean).join("\n"),
-      `Ou copie o Pix com o valor pronto no link: ${dados.link}`,
-    ].join("\n\n");
-  }
-  return [textos[status], `Acompanhe: ${dados.link}`].join("\n\n");
-}
-
 type DadosAgendamento = {
   empresa: string;
   cliente: string;
   servico: string;
   quando: string;
-  placa: string | null;
+  profissional: string | null;
   link: string;
 };
 
 export function mensagemAgendamentoRecebido(dados: DadosAgendamento, confirmado: boolean): string {
   return [
     `Olá, ${dados.cliente}! ${confirmado ? "Seu horário está confirmado" : "Recebemos seu pedido de agendamento"} na ${dados.empresa}.`,
-    `${dados.servico}\n${dados.quando}${dados.placa ? `\nVeículo ${dados.placa}` : ""}`,
+    `${dados.servico}\n${dados.quando}${dados.profissional ? `\nCom ${dados.profissional}` : ""}`,
     confirmado ? `Detalhes e cancelamento: ${dados.link}` : `Assim que a loja confirmar, você recebe uma mensagem. Acompanhe: ${dados.link}`,
   ].join("\n\n");
 }
@@ -140,15 +105,15 @@ export function mensagemAgendamentoRecebido(dados: DadosAgendamento, confirmado:
 export function mensagemNovoAgendamentoLoja(dados: DadosAgendamento & { whatsappCliente: string }): string {
   return [
     `Novo agendamento pela agenda online.`,
-    `${dados.cliente} · ${dados.whatsappCliente}\n${dados.servico}\n${dados.quando}${dados.placa ? `\nVeículo ${dados.placa}` : ""}`,
-    "Confirme no painel da Synex Auto, na aba Agenda.",
+    `${dados.cliente} · ${dados.whatsappCliente}\n${dados.servico}\n${dados.quando}${dados.profissional ? `\nCom ${dados.profissional}` : ""}`,
+    "Confirme no seu painel, na aba Agenda.",
   ].join("\n\n");
 }
 
 export function mensagemAgendamentoConfirmado(dados: DadosAgendamento): string {
   return [
     `Olá, ${dados.cliente}! Seu horário na ${dados.empresa} está confirmado.`,
-    `${dados.servico}\n${dados.quando}`,
+    `${dados.servico}\n${dados.quando}${dados.profissional ? `\nCom ${dados.profissional}` : ""}`,
     `Se precisar cancelar: ${dados.link}`,
   ].join("\n\n");
 }
@@ -158,4 +123,17 @@ export function mensagemAgendamentoCancelado(dados: DadosAgendamento): string {
     `Olá, ${dados.cliente}. Seu agendamento de ${dados.servico} para ${dados.quando} na ${dados.empresa} foi cancelado.`,
     `Para marcar outro horário: ${dados.link}`,
   ].join("\n\n");
+}
+
+export function mensagemAtendido(
+  dados: { empresa: string; cliente: string; servico: string },
+  pagamento: { valor: string; chave: string; titular: string | null } | null,
+): string {
+  const partes = [`Obrigada pela visita, ${dados.cliente}! Seu ${dados.servico} na ${dados.empresa} ficou pronto.`];
+  if (pagamento) {
+    partes.push(`Valor: ${pagamento.valor}`);
+    partes.push(["Pague pelo Pix:", `Chave: ${pagamento.chave}`, pagamento.titular ? `Titular: ${pagamento.titular}` : ""].filter(Boolean).join("\n"));
+  }
+  partes.push("Até a próxima!");
+  return partes.join("\n\n");
 }

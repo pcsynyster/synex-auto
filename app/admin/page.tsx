@@ -40,7 +40,7 @@ export default async function PaginaAdmin() {
         <span className="flex items-center gap-3">
           <SimboloSynex className="w-8" />
           <span>
-            <span className="block text-[11px] font-medium uppercase tracking-[0.2em] text-suave">Synex Auto</span>
+            <span className="block text-[11px] font-medium uppercase tracking-[0.2em] text-suave">Agenda online</span>
             <span className="block text-sm font-semibold">Administração</span>
           </span>
         </span>
@@ -68,9 +68,9 @@ export default async function PaginaAdmin() {
         <FormConvite />
         <ListaConvites convites={convites ?? []} appUrl={env.appUrl} />
 
-        <h2 className="mt-2 text-base font-semibold">Estéticas</h2>
+        <h2 className="mt-2 text-base font-semibold">Salões</h2>
         {lista.length === 0 ? (
-          <p className="rounded-[1.25rem] border border-dashed border-borda p-8 text-center text-sm text-suave">Nenhuma estética cadastrada.</p>
+          <p className="rounded-[1.25rem] border border-dashed border-borda p-8 text-center text-sm text-suave">Nenhum salão cadastrado.</p>
         ) : (
           <ul className="grid gap-3">
             {lista.map((item) => (

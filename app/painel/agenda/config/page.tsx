@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Bloqueios } from "@/components/agenda/bloqueios";
 import { FormConfigAgenda } from "@/components/agenda/form-config";
 import { ListaServicos } from "@/components/agenda/lista-servicos";
+import { ListaProfissionais } from "@/components/agenda/lista-profissionais";
 import { EnviarLogo } from "@/components/ui/enviar-logo";
 import { FormPix } from "@/components/painel/form-pix";
 import { urlLogo } from "@/lib/logo";
@@ -11,7 +12,7 @@ import { dataNoFuso, hojeNoFuso } from "@/lib/datas";
 import { obterContexto } from "@/lib/sessao";
 import type { ConfigAgenda } from "@/app/actions/agenda";
 
-export const metadata: Metadata = { title: "Configurações da loja" };
+export const metadata: Metadata = { title: "Ajustes" };
 
 const HORARIO_PADRAO = { abre: "08:00", fecha: "18:00", ativo: false };
 
@@ -19,16 +20,18 @@ export default async function PaginaConfigAgenda() {
   const ctx = await obterContexto();
   if (!ctx) redirect("/login");
 
-  const [{ data: tenant }, { data: horarios }, { data: servicos }, { data: bloqueios }] = await Promise.all([
+  const [{ data: tenant }, { data: horarios }, { data: servicos }, { data: bloqueios }, { data: equipe }] = await Promise.all([
     ctx.supabase
       .from("tenants")
-      .select("slug, logo_versao, agenda_ativa, confirmacao_automatica, intervalo_agenda_min, capacidade_simultanea, antecedencia_min_horas, janela_dias")
+      .select("slug, logo_versao, agenda_ativa, confirmacao_automatica, intervalo_agenda_min, antecedencia_min_horas, janela_dias")
       .eq("id", ctx.tenantId)
       .single(),
     ctx.supabase.from("horarios_funcionamento").select("dia_semana, abre, fecha, ativo"),
     ctx.supabase.from("servicos").select("id, nome, duracao_min, preco, ativo").order("ordem").order("nome"),
-    ctx.supabase.from("bloqueios_agenda").select("id, inicio, motivo").gte("fim", new Date().toISOString()).order("inicio"),
+    ctx.supabase.from("bloqueios_agenda").select("id, inicio, motivo, profissional_id").gte("fim", new Date().toISOString()).order("inicio"),
+    ctx.supabase.from("profissionais").select("id, nome, ativo").order("ordem").order("nome"),
   ]);
+  const profissionais = equipe ?? [];
 
   if (!tenant) redirect("/painel");
 
@@ -36,7 +39,6 @@ export default async function PaginaConfigAgenda() {
     agenda_ativa: tenant.agenda_ativa,
     confirmacao_automatica: tenant.confirmacao_automatica,
     intervalo_agenda_min: tenant.intervalo_agenda_min as ConfigAgenda["intervalo_agenda_min"],
-    capacidade_simultanea: tenant.capacidade_simultanea,
     antecedencia_min_horas: tenant.antecedencia_min_horas,
     janela_dias: tenant.janela_dias,
     horarios: Array.from({ length: 7 }, (_, dia) => {
@@ -53,25 +55,29 @@ export default async function PaginaConfigAgenda() {
   return (
     <div className="grid grid-cols-1 gap-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Configurações da loja</h1>
-        <Link href="/painel/agenda" className="text-xs text-suave">
-          Voltar
-        </Link>
+        <h1 className="text-xl font-semibold">Ajustes do salão</h1>
       </div>
       <section className="cartao p-4">
-        <h2 className="mb-3 text-sm font-semibold">Logo da loja</h2>
+        <h2 className="mb-3 text-sm font-semibold">Logo do salão</h2>
         <EnviarLogo logoUrl={urlLogo(tenant.slug, tenant.logo_versao)} />
       </section>
       <section id="pix" className="cartao scroll-mt-40 p-4">
         <h2 className="text-sm font-semibold">Pix para pagamento</h2>
-        <p className="mt-1 mb-3 text-xs text-suave">Vai na mensagem de carro pronto, com o valor do serviço, e no link do cliente com o Pix copia e cola.</p>
+        <p className="mt-1 mb-3 text-xs text-suave">Vai na mensagem de agradecimento, com o valor do serviço, quando você marca a cliente como atendida.</p>
         <FormPix chave={ctx.tenant.chave_pix} titular={ctx.tenant.pix_titular} />
       </section>
-      <FormConfigAgenda inicial={config} />
+      <ListaProfissionais profissionais={profissionais} />
       <ListaServicos servicos={servicos ?? []} />
+      <FormConfigAgenda inicial={config} />
       <Bloqueios
         hoje={hojeNoFuso(ctx.tenant.fuso)}
-        bloqueios={(bloqueios ?? []).map((item) => ({ id: item.id, data: dataNoFuso(item.inicio, ctx.tenant.fuso), motivo: item.motivo }))}
+        profissionais={profissionais.filter((item) => item.ativo)}
+        bloqueios={(bloqueios ?? []).map((item) => ({
+          id: item.id,
+          data: dataNoFuso(item.inicio, ctx.tenant.fuso),
+          motivo: item.motivo,
+          profissional: profissionais.find((p) => p.id === item.profissional_id)?.nome ?? null,
+        }))}
       />
     </div>
   );

@@ -9,7 +9,7 @@ import { obterContexto } from "@/lib/sessao";
 const MENSAGENS: Record<string, string> = {
   slug_invalido: "Use de 3 a 40 letras minúsculas, números ou hífen.",
   slug_em_uso: "Esse link já está em uso. Tente outro.",
-  acesso_negado: "Só o dono da loja pode mudar o link.",
+  acesso_negado: "Só a dona do salão pode mudar o link.",
 };
 
 const esquema = z

@@ -6,18 +6,20 @@ import { EditarLink } from "@/components/agenda/editar-link";
 import { env } from "@/lib/env";
 import { dataNoFuso, dataValida, diaDoMes, hojeNoFuso, limitesDoDia, rotuloDataLonga, rotuloDiaCurto, somarDias } from "@/lib/datas";
 import { obterContexto } from "@/lib/sessao";
+import { z } from "zod";
 
 export const metadata: Metadata = { title: "Agenda" };
 
 const DIAS_NA_FAIXA = 14;
 
-export default async function PaginaAgenda({ searchParams }: { searchParams: Promise<{ data?: string }> }) {
+export default async function PaginaAgenda({ searchParams }: { searchParams: Promise<{ data?: string; p?: string }> }) {
   const ctx = await obterContexto();
   if (!ctx) redirect("/login");
 
   const fuso = ctx.tenant.fuso;
   const hoje = hojeNoFuso(fuso);
-  const { data: parametro } = await searchParams;
+  const { data: parametro, p: paramProf } = await searchParams;
+  const profissionalId = paramProf && z.uuid().safeParse(paramProf).success ? paramProf : null;
   const data = parametro && dataValida(parametro) ? parametro : hoje;
   const inicioFaixa = data < hoje ? data : hoje;
   const fimFaixa = somarDias(inicioFaixa, DIAS_NA_FAIXA);
@@ -25,21 +27,37 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
   const dia = limitesDoDia(data, fuso);
   const faixa = { inicio: limitesDoDia(inicioFaixa, fuso).inicio, fim: limitesDoDia(fimFaixa, fuso).inicio };
 
-  const [{ data: agendamentos }, { data: ativosFaixa }, { data: tenant }] = await Promise.all([
-    ctx.supabase
-      .from("agendamentos")
-      .select("id, nome_cliente, whatsapp, placa, modelo, servico_nome, preco, inicio, fim, status, observacoes")
-      .gte("inicio", dia.inicio)
-      .lt("inicio", dia.fim)
-      .order("inicio"),
-    ctx.supabase
-      .from("agendamentos")
-      .select("inicio, status")
-      .in("status", ["pendente", "confirmado"])
-      .gte("inicio", faixa.inicio)
-      .lt("inicio", faixa.fim),
+  let consultaDia = ctx.supabase
+    .from("agendamentos")
+    .select("id, nome_cliente, whatsapp, servico_nome, preco, inicio, fim, status, observacoes, profissional_id, profissionais(nome)")
+    .gte("inicio", dia.inicio)
+    .lt("inicio", dia.fim)
+    .order("inicio");
+  let consultaFaixa = ctx.supabase
+    .from("agendamentos")
+    .select("inicio, status")
+    .in("status", ["pendente", "confirmado"])
+    .gte("inicio", faixa.inicio)
+    .lt("inicio", faixa.fim);
+  if (profissionalId) {
+    consultaDia = consultaDia.eq("profissional_id", profissionalId);
+    consultaFaixa = consultaFaixa.eq("profissional_id", profissionalId);
+  }
+
+  const [{ data: agendamentos }, { data: ativosFaixa }, { data: tenant }, { data: equipe }] = await Promise.all([
+    consultaDia,
+    consultaFaixa,
     ctx.supabase.from("tenants").select("agenda_ativa").eq("id", ctx.tenantId).single(),
+    ctx.supabase.from("profissionais").select("id, nome").eq("ativo", true).order("ordem").order("nome"),
   ]);
+  const profissionais = equipe ?? [];
+  const query = (d: string | null, pr: string | null) => {
+    const q = new URLSearchParams();
+    if (d && d !== hoje) q.set("data", d);
+    if (pr) q.set("p", pr);
+    const t = q.toString();
+    return t ? `/painel/agenda?${t}` : "/painel/agenda";
+  };
 
   const porDia = new Map<string, { total: number; pendentes: number }>();
   for (const item of ativosFaixa ?? []) {
@@ -55,17 +73,37 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
     <div className="grid grid-cols-1 gap-5">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Agenda</h1>
-        <Link href="/painel/agenda/config" className="rounded-full border border-borda px-3.5 py-1.5 text-xs text-texto hover:border-prata/60">
-          Configurações
+        <Link href={`/painel/novo${data !== hoje ? `?data=${data}` : ""}`} className="rounded-full bg-texto px-4 py-2 text-sm font-semibold text-fundo">
+          + Novo agendamento
         </Link>
       </div>
+
+      {profissionais.length > 1 && (
+        <nav className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]" aria-label="Profissional">
+          {[{ id: null as string | null, nome: "Todas" }, ...profissionais].map((item) => {
+            const ativo = item.id === profissionalId;
+            return (
+              <Link
+                key={item.id ?? "todas"}
+                href={query(data, item.id)}
+                aria-current={ativo ? "page" : undefined}
+                className={`shrink-0 rounded-full border px-4 py-2 text-sm transition-colors ${
+                  ativo ? "border-texto bg-texto font-semibold text-fundo" : "border-borda text-suave hover:text-texto"
+                }`}
+              >
+                {item.nome}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
 
       <section className="cartao grid grid-cols-1 gap-3 p-4">
         <div>
           <p className="text-sm font-semibold">Link de agendamento</p>
           <p className="mt-0.5 text-xs text-suave">
             {tenant?.agenda_ativa === false
-              ? "A agenda online está desligada. Ative em Configurações."
+              ? "A agenda online está desligada. Ative em Ajustes."
               : "Coloque na bio do Instagram e no status do WhatsApp."}
           </p>
         </div>
@@ -80,7 +118,7 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
           return (
             <Link
               key={opcao}
-              href={opcao === hoje ? "/painel/agenda" : `/painel/agenda?data=${opcao}`}
+              href={query(opcao, profissionalId)}
               aria-current={ativo ? "date" : undefined}
               className={`relative flex w-14 shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl border py-2.5 transition-colors ${
                 ativo ? "border-texto bg-texto text-fundo" : "border-borda bg-elevado/50"
@@ -107,12 +145,19 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
       {lista.length === 0 ? (
         <p className="rounded-[1.25rem] border border-dashed border-borda p-8 text-center text-sm text-suave">
           Nenhum agendamento neste dia.
+          <Link href={`/painel/novo${data !== hoje ? `?data=${data}` : ""}`} className="mt-2 block text-texto underline underline-offset-4">
+            Marcar um horário
+          </Link>
         </p>
       ) : (
         <ul className="grid gap-3">
           {lista.map((item) => (
             <li key={item.id}>
-              <CartaoAgendamento {...item} fuso={fuso} />
+              <CartaoAgendamento
+                {...item}
+                fuso={fuso}
+                profissional={profissionais.length > 1 || !item.profissionais ? (item.profissionais?.nome ?? null) : null}
+              />
             </li>
           ))}
         </ul>

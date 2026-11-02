@@ -7,7 +7,6 @@ import { RodapeSynex } from "@/components/ui/rodape-synex";
 import { PADRAO_TOKEN, ROTULO_STATUS_AGENDAMENTO, type AgendamentoPublico } from "@/lib/agenda";
 import { dataNoFuso, formatarDuracao, horaNoFuso, rotuloDataLonga } from "@/lib/datas";
 import { formatarMoeda } from "@/lib/formato";
-import { formatarPlaca } from "@/lib/placa";
 import { criarClienteAnonimo } from "@/lib/supabase/anon";
 import { linkWhatsapp } from "@/lib/telefone";
 import { imagensCompartilhamento, urlLogo } from "@/lib/logo";
@@ -77,13 +76,10 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
             <dt className="text-suave">Duração</dt>
             <dd>{formatarDuracao(agendamento.duracao_min)}</dd>
           </div>
-          {agendamento.placa && (
+          {agendamento.profissional && (
             <div className="flex justify-between gap-4">
-              <dt className="text-suave">Veículo</dt>
-              <dd className="font-mono">
-                {formatarPlaca(agendamento.placa)}
-                {agendamento.modelo ? ` · ${agendamento.modelo}` : ""}
-              </dd>
+              <dt className="text-suave">Profissional</dt>
+              <dd>{agendamento.profissional}</dd>
             </div>
           )}
           <div className="flex justify-between gap-4">
@@ -93,7 +89,7 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
         </dl>
         {agendamento.status === "pendente" && (
           <p className="rounded-2xl border border-borda bg-black/40 px-4 py-3 text-sm text-suave">
-            A loja vai confirmar seu horário e você recebe a confirmação pelo WhatsApp.
+            O salão vai confirmar seu horário e você recebe a confirmação pelo WhatsApp.
           </p>
         )}
       </section>
@@ -101,10 +97,10 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
       <div className="grid gap-2">
         {agendamento.status === "pendente" ? (
           <BotaoWhatsapp
-            rotulo="Avisar a loja no WhatsApp"
+            rotulo="Avisar o salão no WhatsApp"
             link={linkWhatsapp(
               agendamento.telefone_empresa,
-              `Olá! Sou ${agendamento.nome} e acabei de agendar ${agendamento.servico} para ${rotuloDataLonga(data_)}, às ${horaNoFuso(agendamento.inicio, agendamento.fuso)}${agendamento.placa ? `, veículo ${formatarPlaca(agendamento.placa)}` : ""}.`,
+              `Olá! Sou ${agendamento.nome} e acabei de agendar ${agendamento.servico} para ${rotuloDataLonga(data_)}, às ${horaNoFuso(agendamento.inicio, agendamento.fuso)}${agendamento.profissional ? `, com ${agendamento.profissional}` : ""}.`,
             )}
           />
         ) : (
@@ -112,7 +108,7 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
             href={linkWhatsapp(agendamento.telefone_empresa)}
             className="flex h-12 items-center justify-center rounded-full border border-borda bg-elevado/60 text-sm font-semibold"
           >
-            Falar com a loja
+            Falar com o salão
           </a>
         )}
         {agendamento.pode_cancelar && <CancelarAgendamento token={token} />}
@@ -125,7 +121,7 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
           </Link>
         )}
         {ativo && !agendamento.pode_cancelar && (
-          <p className="text-center text-xs text-suave">Faltando menos de 2 horas, o cancelamento é feito direto com a loja.</p>
+          <p className="text-center text-xs text-suave">Faltando menos de 2 horas, o cancelamento é feito direto com o salão.</p>
         )}
       </div>
 

@@ -12,7 +12,7 @@ function Item({ convite, appUrl }: { convite: ConvitePendente; appUrl: string })
   const [pendente, iniciar] = useTransition();
   const link = `${appUrl}/login?convite=${encodeURIComponent(convite.email)}`;
   const mensagem = [
-    `Olá! Seu acesso à Synex Auto${convite.nome_empresa ? ` para a ${convite.nome_empresa}` : ""} está liberado.`,
+    `Olá! Seu acesso à agenda online da Synex${convite.nome_empresa ? ` para o ${convite.nome_empresa}` : ""} está liberado.`,
     `Crie sua conta com este e-mail (${convite.email}) pelo link:`,
     link,
     convite.dias_teste > 0 ? `São ${convite.dias_teste} dias grátis para testar.` : "",

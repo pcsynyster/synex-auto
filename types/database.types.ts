@@ -356,6 +356,12 @@ export type Database = {
           },
         ];
       };
+      profissionais: {
+        Row: { id: string; tenant_id: string; nome: string; ativo: boolean; ordem: number; criado_em: string };
+        Insert: { id?: string; tenant_id: string; nome: string; ativo?: boolean; ordem?: number };
+        Update: { nome?: string; ativo?: boolean; ordem?: number };
+        Relationships: [];
+      };
       bloqueios_agenda: {
         Row: {
           id: string;
@@ -363,6 +369,7 @@ export type Database = {
           inicio: string;
           fim: string;
           motivo: string | null;
+          profissional_id: string | null;
           criado_em: string;
         };
         Insert: {
@@ -371,6 +378,7 @@ export type Database = {
           inicio: string;
           fim: string;
           motivo?: string | null;
+          profissional_id?: string | null;
         };
         Update: {
           inicio?: string;
@@ -394,6 +402,7 @@ export type Database = {
           servico_id: string | null;
           cliente_id: string | null;
           ordem_servico_id: string | null;
+          profissional_id: string | null;
           nome_cliente: string;
           whatsapp: string;
           placa: string | null;
@@ -415,8 +424,16 @@ export type Database = {
           status?: Database["public"]["Enums"]["status_agendamento"];
           observacoes?: string | null;
           ordem_servico_id?: string | null;
+          profissional_id?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "agendamentos_profissional_fk";
+            columns: ["tenant_id", "profissional_id"];
+            isOneToOne: false;
+            referencedRelation: "profissionais";
+            referencedColumns: ["tenant_id", "id"];
+          },
           {
             foreignKeyName: "agendamentos_tenant_id_fkey";
             columns: ["tenant_id"];
@@ -507,6 +524,22 @@ export type Database = {
       };
       agenda_publica: {
         Args: { p_slug: string };
+        Returns: Json;
+      };
+      horarios_livres: {
+        Args: { p_slug: string; p_servico_id: string; p_data: string; p_profissional_id?: string };
+        Returns: string[];
+      };
+      horarios_livres_painel: {
+        Args: { p_servico_id: string; p_data: string; p_profissional_id?: string };
+        Returns: string[];
+      };
+      agendar_publico: {
+        Args: { p_slug: string; p_servico_id: string; p_profissional_id: string; p_inicio: string; p_nome: string; p_whatsapp: string; p_observacoes: string };
+        Returns: Json;
+      };
+      criar_agendamento_painel: {
+        Args: { p_servico_id: string; p_profissional_id: string; p_inicio: string; p_nome: string; p_whatsapp: string; p_observacoes: string };
         Returns: Json;
       };
       horarios_disponiveis: {

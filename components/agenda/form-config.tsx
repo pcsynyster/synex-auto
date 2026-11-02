@@ -153,26 +153,16 @@ export function FormConfigAgenda({ inicial }: { inicial: ConfigAgenda }) {
               </button>
             ))}
           </div>
-          <span className="text-xs text-suave">Em minutos. Com 30, o cliente vê 08:00, 08:30, 09:00...</span>
+          <span className="text-xs text-suave">Em minutos. Com 30, a cliente vê 08:00, 08:30, 09:00...</span>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Numero
-            rotulo="Carros ao mesmo tempo"
-            valor={config.capacidade_simultanea}
-            aoMudar={(valor) => alterar("capacidade_simultanea", valor)}
-            min={1}
-            max={20}
-            sufixo="vagas"
-          />
-          <Numero
-            rotulo="Antecedência mínima"
-            valor={config.antecedencia_min_horas}
-            aoMudar={(valor) => alterar("antecedencia_min_horas", valor)}
-            min={0}
-            max={72}
-            sufixo="h"
-          />
-        </div>
+        <Numero
+          rotulo="Antecedência mínima para marcar"
+          valor={config.antecedencia_min_horas}
+          aoMudar={(valor) => alterar("antecedencia_min_horas", valor)}
+          min={0}
+          max={72}
+          sufixo="h"
+        />
         <Numero
           rotulo="Clientes podem marcar até quantos dias à frente"
           valor={config.janela_dias}

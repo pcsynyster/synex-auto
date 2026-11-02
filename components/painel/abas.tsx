@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const ABAS = [
-  { href: "/painel", rotulo: "Serviços", ativa: (caminho: string) => caminho === "/painel" || caminho.startsWith("/painel/nova") },
-  { href: "/painel/agenda", rotulo: "Agenda", ativa: (caminho: string) => caminho.startsWith("/painel/agenda") },
+  { href: "/painel/agenda", rotulo: "Agenda", ativa: (caminho: string) => (caminho.startsWith("/painel/agenda") && !caminho.startsWith("/painel/agenda/config")) || caminho.startsWith("/painel/novo") },
   { href: "/painel/resumo", rotulo: "Resumo", ativa: (caminho: string) => caminho.startsWith("/painel/resumo") },
+  { href: "/painel/agenda/config", rotulo: "Ajustes", ativa: (caminho: string) => caminho.startsWith("/painel/agenda/config") },
 ];
 
 export function AbasPainel({ pendentes }: { pendentes: number }) {

@@ -11,7 +11,7 @@ export const PERIODOS = [
 export type PeriodoId = (typeof PERIODOS)[number]["id"];
 
 export const LISTAS = [
-  { id: "carros", rotulo: "Carros atendidos" },
+  { id: "atendidos", rotulo: "Atendimentos" },
   { id: "passados", rotulo: "Agendamentos passados" },
   { id: "proximos", rotulo: "Próximos" },
 ] as const;
@@ -19,14 +19,14 @@ export const LISTAS = [
 export type ListaId = (typeof LISTAS)[number]["id"];
 
 export type Resumo = {
-  carros: number;
+  atendimentos: number;
   recebido: number;
   clientes: number;
-  com_plano: number;
-  em_andamento: number;
+  proximos: number;
   agendamentos: { total: number; concluido: number; aberto: number; cancelado: number; nao_compareceu: number };
   serie: { periodo: string; valor: number; carros: number }[];
   servicos: { nome: string; qtd: number; valor: number }[];
+  profissionais: { nome: string; qtd: number; valor: number }[];
 };
 
 export function lerPeriodo(valor: string | undefined): PeriodoId {
@@ -34,7 +34,7 @@ export function lerPeriodo(valor: string | undefined): PeriodoId {
 }
 
 export function lerLista(valor: string | undefined): ListaId {
-  return LISTAS.some((lista) => lista.id === valor) ? (valor as ListaId) : "carros";
+  return LISTAS.some((lista) => lista.id === valor) ? (valor as ListaId) : "atendidos";
 }
 
 export function faixaDoPeriodo(periodo: PeriodoId, fuso: string) {

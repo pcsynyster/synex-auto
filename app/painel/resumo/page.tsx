@@ -5,7 +5,6 @@ import { GraficoBarras } from "@/components/resumo/grafico-barras";
 import { ROTULO_STATUS_AGENDAMENTO } from "@/lib/agenda";
 import { dataNoFuso, horaNoFuso } from "@/lib/datas";
 import { formatarMoeda } from "@/lib/formato";
-import { formatarPlaca } from "@/lib/placa";
 import { obterContexto } from "@/lib/sessao";
 import { faixaDoPeriodo, LISTAS, lerLista, lerPeriodo, PERIODOS, preencherSerie, type Resumo } from "@/lib/resumo";
 
@@ -39,31 +38,17 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
   const faixa = faixaDoPeriodo(periodo, fuso);
   const agora = new Date().toISOString();
 
+  const base = ctx.supabase.from("agendamentos").select("id, nome_cliente, servico_nome, preco, inicio, status, profissionais(nome)");
   const consultaLista =
-    lista === "carros"
-      ? ctx.supabase
-          .from("ordens_servico")
-          .select("id, valor_total, entregue_em, token_publico, plano_assinatura_id, veiculos(placa, modelo, clientes(nome))")
-          .eq("status", "entregue")
-          .gte("entregue_em", faixa.inicio)
-          .lt("entregue_em", faixa.fim)
-          .order("entregue_em", { ascending: false })
-          .limit(LIMITE)
+    lista === "atendidos"
+      ? base.eq("status", "concluido").gte("inicio", faixa.inicio).lt("inicio", faixa.fim).order("inicio", { ascending: false }).limit(LIMITE)
       : lista === "passados"
-        ? ctx.supabase
-            .from("agendamentos")
-            .select("id, nome_cliente, servico_nome, preco, inicio, status, placa, modelo")
+        ? base
             .gte("inicio", faixa.inicio)
             .lt("inicio", agora < faixa.fim ? agora : faixa.fim)
             .order("inicio", { ascending: false })
             .limit(LIMITE)
-        : ctx.supabase
-            .from("agendamentos")
-            .select("id, nome_cliente, servico_nome, preco, inicio, status, placa, modelo")
-            .in("status", ["pendente", "confirmado"])
-            .gte("inicio", agora)
-            .order("inicio")
-            .limit(LIMITE);
+        : base.in("status", ["pendente", "confirmado"]).gte("inicio", agora).order("inicio").limit(LIMITE);
 
   const [{ data: dados }, { data: itens }] = await Promise.all([
     ctx.supabase.rpc("resumo_painel", { p_inicio: faixa.inicio, p_fim: faixa.fim, p_agrupar: faixa.agrupar }),
@@ -76,7 +61,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
   }
 
   const recebido = Number(resumo.recebido);
-  const ticket = resumo.carros > 0 ? recebido / resumo.carros : 0;
+  const ticket = resumo.atendimentos > 0 ? recebido / resumo.atendimentos : 0;
   const serie = faixa.agrupar === "dia" ? preencherSerie(resumo.serie, faixa.primeiroDia, faixa.hoje) : resumo.serie;
   const ag = resumo.agendamentos;
   const encerrados = ag.concluido + ag.nao_compareceu;
@@ -89,7 +74,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
     <div className="grid grid-cols-1 gap-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Resumo</h1>
-        <span className="rounded-full border border-borda px-2.5 py-1 text-xs text-suave">{resumo.em_andamento} em andamento agora</span>
+        <span className="rounded-full border border-borda px-2.5 py-1 text-xs text-suave">{resumo.proximos} próximos horários</span>
       </div>
 
       <nav className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" aria-label="Período">
@@ -111,15 +96,15 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
         <div>
           <p className="text-xs text-suave">Recebido · {rotuloPeriodo}</p>
           <p className="texto-prata mt-1 text-4xl font-semibold tabular-nums">{formatarMoeda(recebido)}</p>
-          <p className="mt-1 text-[11px] text-suave">Soma das ordens de serviço entregues no período.</p>
+          <p className="mt-1 text-[11px] text-suave">Soma dos atendimentos marcados como atendidos no período.</p>
         </div>
         {periodo !== "hoje" && serie.length > 1 && <GraficoBarras serie={serie} porMes={faixa.agrupar === "mes"} />}
       </section>
 
       <div className="grid grid-cols-2 gap-3">
-        <Indicador rotulo="Carros atendidos" valor={String(resumo.carros)} detalhe={resumo.com_plano > 0 ? `${resumo.com_plano} com plano mensal` : undefined} />
+        <Indicador rotulo="Atendimentos" valor={String(resumo.atendimentos)} />
         <Indicador rotulo="Ticket médio" valor={formatarMoeda(ticket)} />
-        <Indicador rotulo="Clientes atendidos" valor={String(resumo.clientes)} />
+        <Indicador rotulo="Clientes" valor={String(resumo.clientes)} />
         <Indicador rotulo="Agendamentos" valor={String(ag.total)} detalhe={comparecimento !== null ? `${comparecimento}% compareceram` : undefined} />
       </div>
 
@@ -139,6 +124,30 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
           ))}
         </dl>
       </section>
+
+      {resumo.profissionais.length > 1 && (
+        <section className="cartao grid gap-3 p-4">
+          <h2 className="text-sm font-semibold">Por profissional</h2>
+          <ul className="grid gap-2.5">
+            {resumo.profissionais.map((item) => {
+              const largura = (Number(item.valor) / Math.max(1, Number(resumo.profissionais[0]?.valor ?? 1))) * 100;
+              return (
+                <li key={item.nome} className="grid gap-1">
+                  <div className="flex items-baseline justify-between gap-3 text-sm">
+                    <span className="truncate">{item.nome}</span>
+                    <span className="shrink-0 text-xs text-suave tabular-nums">
+                      {item.qtd} {item.qtd === 1 ? "atendimento" : "atendimentos"} · {formatarMoeda(Number(item.valor))}
+                    </span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-elevado">
+                    <div className="barra-prata h-full rounded-full" style={{ width: `${largura}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {resumo.servicos.length > 0 && (
         <section className="cartao grid gap-3 p-4">
@@ -182,42 +191,12 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
 
         {registros.length === 0 ? (
           <p className="rounded-[1.25rem] border border-dashed border-borda p-6 text-center text-sm text-suave">
-            {lista === "carros"
-              ? "Nenhum carro entregue neste período."
+            {lista === "atendidos"
+              ? "Nenhum atendimento neste período."
               : lista === "passados"
                 ? "Nenhum agendamento neste período."
                 : "Nenhum agendamento marcado daqui pra frente."}
           </p>
-        ) : lista === "carros" ? (
-          <ul className="cartao min-w-0 divide-y divide-borda overflow-hidden">
-            {(itens as unknown as {
-              id: string;
-              valor_total: number;
-              entregue_em: string;
-              token_publico: string;
-              plano_assinatura_id: string | null;
-              veiculos: { placa: string; modelo: string; clientes: { nome: string } | null } | null;
-            }[]).map((os) => (
-              <li key={os.id}>
-                <Link href={`/painel/os/${os.id}`} className="flex min-w-0 items-center justify-between gap-3 px-4 py-3">
-                  <span className="min-w-0">
-                    <span className="flex items-center gap-2">
-                      <span className="rounded bg-texto px-1.5 py-0.5 font-mono text-[11px] font-bold tracking-widest text-fundo">
-                        {os.veiculos ? formatarPlaca(os.veiculos.placa) : "-"}
-                      </span>
-                      <span className="truncate text-sm">{os.veiculos?.modelo}</span>
-                    </span>
-                    <span className="mt-1 block truncate text-xs text-suave">
-                      {os.veiculos?.clientes?.nome} · {dataCurta(os.entregue_em, fuso)} às {horaNoFuso(os.entregue_em, fuso)}
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-right text-sm font-semibold tabular-nums">
-                    {os.plano_assinatura_id && Number(os.valor_total) === 0 ? "Plano" : formatarMoeda(Number(os.valor_total))}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
         ) : (
           <ul className="cartao min-w-0 divide-y divide-borda overflow-hidden">
             {(itens as unknown as {
@@ -227,8 +206,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
               preco: number;
               inicio: string;
               status: keyof typeof ROTULO_STATUS_AGENDAMENTO;
-              placa: string | null;
-              modelo: string | null;
+              profissionais: { nome: string } | null;
             }[]).map((item) => (
               <li key={item.id}>
                 <Link href={`/painel/agenda?data=${dataNoFuso(item.inicio, fuso)}`} className="flex min-w-0 items-center justify-between gap-3 px-4 py-3">
@@ -236,7 +214,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
                     <span className="block truncate text-sm font-medium">{item.nome_cliente}</span>
                     <span className="mt-0.5 block truncate text-xs text-suave">
                       {dataCurta(item.inicio, fuso)} às {horaNoFuso(item.inicio, fuso)} · {item.servico_nome}
-                      {item.modelo ? ` · ${item.modelo}` : ""}
+                      {item.profissionais ? ` · ${item.profissionais.nome}` : ""}
                     </span>
                   </span>
                   <span className="grid shrink-0 justify-items-end gap-1">

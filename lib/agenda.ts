@@ -20,7 +20,10 @@ export type AgendaPublica = {
   dias_abertos: number[];
   dias_bloqueados: string[];
   servicos: ServicoPublico[];
+  profissionais: ProfissionalPublico[];
 };
+
+export type ProfissionalPublico = { id: string; nome: string };
 
 export type AgendamentoPublico = {
   status: StatusAgendamento;
@@ -29,8 +32,7 @@ export type AgendamentoPublico = {
   servico: string;
   preco: number;
   duracao_min: number;
-  placa: string | null;
-  modelo: string | null;
+  profissional: string | null;
   nome: string;
   empresa: string;
   telefone_empresa: string;

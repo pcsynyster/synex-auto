@@ -1,22 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
 import { atualizarStatusAgendamento } from "@/app/actions/agenda";
 import { BotaoWhatsapp } from "@/components/ui/botao-whatsapp";
 import { ROTULO_STATUS_AGENDAMENTO } from "@/lib/agenda";
 import { horaNoFuso } from "@/lib/datas";
 import { formatarMoeda } from "@/lib/formato";
-import { formatarPlaca } from "@/lib/placa";
 import { formatarTelefone, linkWhatsapp } from "@/lib/telefone";
 import type { Agendamento } from "@/types/database.types";
 
-type Acao = "confirmado" | "cancelado" | "nao_compareceu";
+type Acao = "confirmado" | "cancelado" | "nao_compareceu" | "concluido";
 
 const ROTULO_ACAO: Record<Acao, string> = {
   confirmado: "Confirmar",
   cancelado: "Cancelar horário",
   nao_compareceu: "Marcar que não veio",
+  concluido: "Marcar como atendida",
 };
 
 const ESTILO_STATUS: Record<Agendamento["status"], string> = {
@@ -29,16 +28,17 @@ const ESTILO_STATUS: Record<Agendamento["status"], string> = {
 
 type Props = Pick<
   Agendamento,
-  "id" | "nome_cliente" | "whatsapp" | "placa" | "modelo" | "servico_nome" | "preco" | "inicio" | "fim" | "status" | "observacoes"
-> & { fuso: string };
+  "id" | "nome_cliente" | "whatsapp" | "servico_nome" | "preco" | "inicio" | "fim" | "status" | "observacoes"
+> & { fuso: string; profissional?: string | null };
 
 export function CartaoAgendamento(props: Props) {
-  const { id, nome_cliente, whatsapp, placa, modelo, servico_nome, preco, inicio, fim, status, observacoes, fuso } = props;
+  const { id, nome_cliente, whatsapp, servico_nome, preco, inicio, fim, status, observacoes, fuso, profissional } = props;
+  const [ultimaAcao, setUltimaAcao] = useState<Acao | null>(null);
   const [confirmar, setConfirmar] = useState<Acao | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [linkAviso, setLinkAviso] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
-  const encerrado = status === "cancelado" || status === "nao_compareceu" || status === "concluido";
+  const encerrado = !linkAviso && (status === "cancelado" || status === "nao_compareceu" || status === "concluido");
 
   function executar(acao: Acao) {
     setAviso(null);
@@ -46,6 +46,7 @@ export function CartaoAgendamento(props: Props) {
       const resultado = await atualizarStatusAgendamento(id, acao);
       setConfirmar(null);
       if (!resultado.ok) return setAviso(resultado.erro);
+      setUltimaAcao(acao);
       if (resultado.aviso) setAviso(resultado.aviso);
       setLinkAviso(resultado.whatsapp ?? null);
     });
@@ -73,10 +74,9 @@ export function CartaoAgendamento(props: Props) {
         <p className="text-sm text-suave">
           {servico_nome} · {formatarMoeda(Number(preco))}
         </p>
-        {(placa || modelo) && (
+        {profissional && (
           <p className="text-sm">
-            {placa && <span className="mr-2 rounded bg-texto px-1.5 py-0.5 font-mono text-xs font-bold tracking-widest text-fundo">{formatarPlaca(placa)}</span>}
-            <span className="text-suave">{modelo}</span>
+            <span className="rounded-full border border-borda px-2 py-0.5 text-xs text-texto">{profissional}</span>
           </p>
         )}
         {observacoes && <p className="mt-1 rounded-xl bg-black/40 px-3 py-2 text-xs text-suave">{observacoes}</p>}
@@ -87,7 +87,13 @@ export function CartaoAgendamento(props: Props) {
       {linkAviso && (
         <BotaoWhatsapp
           link={linkAviso}
-          rotulo={status === "cancelado" ? "Avisar cancelamento no WhatsApp" : "Enviar confirmação no WhatsApp"}
+          rotulo={
+            ultimaAcao === "cancelado"
+              ? "Avisar cancelamento no WhatsApp"
+              : ultimaAcao === "concluido"
+                ? "Enviar agradecimento e Pix no WhatsApp"
+                : "Enviar confirmação no WhatsApp"
+          }
           aoClicar={() => setLinkAviso(null)}
         />
       )}
@@ -122,12 +128,14 @@ export function CartaoAgendamento(props: Props) {
         </div>
       ) : status === "confirmado" ? (
         <div className="grid gap-2">
-          <Link
-            href={`/painel/nova?agendamento=${id}`}
-            className="flex h-11 items-center justify-center rounded-full bg-texto text-sm font-semibold text-fundo"
+          <button
+            type="button"
+            onClick={() => executar("concluido")}
+            disabled={pendente}
+            className="flex h-11 items-center justify-center rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50"
           >
-            Cliente chegou: dar entrada
-          </Link>
+            {pendente ? "Salvando..." : "Marcar como atendida"}
+          </button>
           <div className="grid grid-cols-2 gap-2">
             <button type="button" onClick={() => setConfirmar("nao_compareceu")} className="h-10 rounded-full border border-borda text-xs text-suave">
               Não veio

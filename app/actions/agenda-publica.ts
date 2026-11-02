@@ -5,20 +5,21 @@ import { env } from "@/lib/env";
 import { criarClienteAnonimo } from "@/lib/supabase/anon";
 import { PADRAO_SLUG, PADRAO_TOKEN, type AgendamentoPublico } from "@/lib/agenda";
 import { dataNoFuso, dataValida, horaNoFuso, rotuloDataLonga } from "@/lib/datas";
-import { formatarPlaca, normalizarPlaca, placaValida } from "@/lib/placa";
 import { falha, sucesso, traduzirErroAgenda, type Resultado } from "@/lib/resultado";
 import { formatarTelefone, normalizarWhatsapp } from "@/lib/telefone";
 import { enviarWhatsapp, mensagemAgendamentoRecebido, mensagemNovoAgendamentoLoja } from "@/lib/whatsapp";
 
-export async function buscarHorarios(slug: string, servicoId: string, data: string): Promise<Resultado<string[]>> {
+export async function buscarHorarios(slug: string, servicoId: string, data: string, profissionalId: string | null): Promise<Resultado<string[]>> {
   if (!PADRAO_SLUG.test(slug) || !z.uuid().safeParse(servicoId).success || !dataValida(data)) {
     return falha("Dados inválidos.");
   }
+  if (profissionalId && !z.uuid().safeParse(profissionalId).success) return falha("Dados inválidos.");
 
-  const { data: horarios, error } = await criarClienteAnonimo().rpc("horarios_disponiveis", {
+  const { data: horarios, error } = await criarClienteAnonimo().rpc("horarios_livres", {
     p_slug: slug,
     p_servico_id: servicoId,
     p_data: data,
+    p_profissional_id: profissionalId ?? undefined,
   });
 
   if (error) return falha("Não foi possível carregar os horários.");
@@ -28,18 +29,13 @@ export async function buscarHorarios(slug: string, servicoId: string, data: stri
 const esquemaAgendamento = z.object({
   slug: z.string().regex(PADRAO_SLUG),
   servicoId: z.uuid(),
+  profissionalId: z.uuid().nullable(),
   inicio: z.iso.datetime({ offset: true }),
   nome: z.string().trim().min(2, "Informe seu nome.").max(120),
   whatsapp: z
     .string()
     .transform(normalizarWhatsapp)
     .refine((valor): valor is string => valor !== null, "WhatsApp inválido. Use DDD + número."),
-  placa: z
-    .string()
-    .transform(normalizarPlaca)
-    .refine((valor) => valor === "" || placaValida(valor), "Placa inválida.")
-    .optional(),
-  modelo: z.string().trim().max(80).optional(),
   observacoes: z.string().trim().max(300).optional(),
 });
 
@@ -49,17 +45,16 @@ export async function agendar(dados: DadosAgendamento): Promise<Resultado<{ toke
   const validacao = esquemaAgendamento.safeParse(dados);
   if (!validacao.success) return falha(validacao.error.issues[0]?.message ?? "Confira os dados.");
 
-  const { slug, servicoId, inicio, nome, whatsapp, placa, modelo, observacoes } = validacao.data;
+  const { slug, servicoId, profissionalId, inicio, nome, whatsapp, observacoes } = validacao.data;
 
-  const { data, error } = await criarClienteAnonimo().rpc("criar_agendamento_publico", {
+  const { data, error } = await criarClienteAnonimo().rpc("agendar_publico", {
     p_slug: slug,
     p_servico_id: servicoId,
+    p_profissional_id: profissionalId as string,
     p_inicio: inicio,
     p_nome: nome,
     p_whatsapp: whatsapp,
-    p_placa: placa || null,
-    p_modelo: modelo || null,
-    p_observacoes: observacoes || null,
+    p_observacoes: (observacoes || null) as string,
   });
 
   if (error || !data) return falha(traduzirErroAgenda(error?.message ?? ""));
@@ -71,7 +66,7 @@ export async function agendar(dados: DadosAgendamento): Promise<Resultado<{ toke
     cliente: agendamento.nome,
     servico: agendamento.servico,
     quando,
-    placa: agendamento.placa ? formatarPlaca(agendamento.placa) : null,
+    profissional: agendamento.profissional,
     link: `${env.appUrl}/agendamento/${agendamento.token}`,
   };
 

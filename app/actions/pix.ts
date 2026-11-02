@@ -15,7 +15,7 @@ const esquema = z.object({
 export async function salvarPix(dados: { tipo: string; chave: string; titular: string }): Promise<Resultado<string | null>> {
   const ctx = await obterContexto();
   if (!ctx) return falha("Sessão expirada. Entre novamente.");
-  if (ctx.papel !== "dono") return falha("Só o dono da loja pode alterar o Pix.");
+  if (ctx.papel !== "dono") return falha("Só a dona do salão pode alterar o Pix.");
 
   const validacao = esquema.safeParse(dados);
   if (!validacao.success) return falha("Dados inválidos.");

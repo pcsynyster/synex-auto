@@ -19,7 +19,7 @@ export function GraficoBarras({ serie, porMes }: { serie: { periodo: string; val
             <div
               className={`w-full rounded-t-md ${Number(item.valor) > 0 ? "barra-prata" : "bg-elevado"}`}
               style={{ height: `${Math.max((Number(item.valor) / maximo) * 100, 3)}%` }}
-              title={`${rotulo(item.periodo, porMes)}: ${formatarMoeda(Number(item.valor))} · ${item.carros} ${item.carros === 1 ? "carro" : "carros"}`}
+              title={`${rotulo(item.periodo, porMes)}: ${formatarMoeda(Number(item.valor))} · ${item.carros} ${item.carros === 1 ? "atendimento" : "atendimentos"}`}
             />
           </div>
         ))}

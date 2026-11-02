@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Synex Auto",
+    name: "Synex Agenda",
     short_name: "Synex",
-    description: "Ordens de serviço e vistoria para estética automotiva.",
+    description: "Agenda online para salões de unhas.",
     start_url: "/painel",
     display: "standalone",
     orientation: "portrait",

@@ -16,8 +16,8 @@ function FormModo({ modo, voltar, emailInicial }: { modo: Modo; voltar: string; 
       {modo === "cadastrar" && (
         <>
           <Campo rotulo="Seu nome" name="nome" autoComplete="name" required />
-          <Campo rotulo="Nome da estética" name="nome_empresa" autoComplete="organization" required />
-          <Campo rotulo="WhatsApp da loja" name="telefone" inputMode="tel" placeholder="(84) 99999-9999" required />
+          <Campo rotulo="Nome do salão" name="nome_empresa" autoComplete="organization" required />
+          <Campo rotulo="WhatsApp do salão" name="telefone" inputMode="tel" placeholder="(84) 99999-9999" required />
           <Campo rotulo="Cidade" name="cidade" autoComplete="address-level2" required />
         </>
       )}

@@ -39,7 +39,7 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
       ? `venceu há ${Math.abs(situacao.diasRestantes)} ${Math.abs(situacao.diasRestantes) === 1 ? "dia" : "dias"}`
       : "acesso suspenso";
 
-  const cobranca = `Olá! A mensalidade da Synex Auto (${formatarMoeda(Number(estetica.valor_mensal))}) da ${estetica.nome} vence em ${formatarData(estetica.assinatura_valida_ate)}. Posso te mandar o Pix?`;
+  const cobranca = `Olá! A mensalidade da agenda Synex (${formatarMoeda(Number(estetica.valor_mensal))}) do ${estetica.nome} vence em ${formatarData(estetica.assinatura_valida_ate)}. Posso te mandar o Pix?`;
 
   return (
     <article className={`cartao grid grid-cols-1 gap-3 p-4 ${situacao.ativa ? "" : "border-alerta/40"}`}>
@@ -76,7 +76,7 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
           <dd className="text-sm font-semibold tabular-nums">{formatarMoeda(Number(estetica.valor_mensal))}</dd>
         </div>
         <div>
-          <dt className="text-[11px] text-suave">OS em 30 dias</dt>
+          <dt className="text-[11px] text-suave">Atendidas 30 dias</dt>
           <dd className="text-sm font-semibold tabular-nums">{estetica.os_30_dias}</dd>
         </div>
       </dl>

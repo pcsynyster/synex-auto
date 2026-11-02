@@ -5,10 +5,9 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { agendar, buscarHorarios } from "@/app/actions/agenda-publica";
 import { Botao } from "@/components/ui/botao";
 import { Campo } from "@/components/ui/campo";
-import type { AgendaPublica, ServicoPublico } from "@/lib/agenda";
+import type { AgendaPublica, ProfissionalPublico, ServicoPublico } from "@/lib/agenda";
 import { diaDaSemana, diaDoMes, formatarDuracao, horaNoFuso, rotuloDataLonga, rotuloDiaCurto, somarDias } from "@/lib/datas";
 import { formatarMoeda } from "@/lib/formato";
-import { normalizarPlaca } from "@/lib/placa";
 
 function Etapa({ numero, titulo, children }: { numero: number; titulo: string; children: React.ReactNode }) {
   return (
@@ -28,7 +27,8 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
   const [data, setData] = useState<string | null>(null);
   const [horarios, setHorarios] = useState<string[] | null>(null);
   const [horario, setHorario] = useState<string | null>(null);
-  const [placa, setPlaca] = useState("");
+  const variasProfissionais = agenda.profissionais.length > 1;
+  const [profissional, setProfissional] = useState<ProfissionalPublico | null | undefined>(variasProfissionais ? undefined : null);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
   const [enviando, iniciarEnvio] = useTransition();
@@ -44,12 +44,13 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
     });
   }, [agenda]);
 
-  function carregarHorarios(servicoId: string, dia: string) {
+  function carregarHorarios(servicoId: string, dia: string, prof: ProfissionalPublico | null | undefined = profissional) {
+    if (prof === undefined) return;
     setHorarios(null);
     setHorario(null);
     setErro(null);
     iniciarCarga(async () => {
-      const resultado = await buscarHorarios(slug, servicoId, dia);
+      const resultado = await buscarHorarios(slug, servicoId, dia, prof?.id ?? null);
       if (resultado.ok) setHorarios(resultado.dados);
       else setErro(resultado.erro);
     });
@@ -62,14 +63,24 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
     if (dia) carregarHorarios(opcao.id, dia);
   }
 
+  function escolherProfissional(opcao: ProfissionalPublico | null) {
+    setProfissional(opcao);
+    if (servico && data) carregarHorarios(servico.id, data, opcao);
+  }
+
   function escolherDia(dia: string) {
     setData(dia);
     if (servico) carregarHorarios(servico.id, dia);
   }
 
+  const refProfissional = useRef<HTMLDivElement>(null);
+  const prontoParaHorario = servico !== null && profissional !== undefined;
+  const numeroHorario = variasProfissionais ? 3 : 2;
+
   useEffect(() => {
-    if (servico) refHorarios.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [servico]);
+    if (servico && variasProfissionais && profissional === undefined) refProfissional.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    else if (servico) refHorarios.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [servico, profissional, variasProfissionais]);
 
   useEffect(() => {
     if (horario) refDados.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -82,11 +93,10 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
       const resultado = await agendar({
         slug,
         servicoId: servico.id,
+        profissionalId: profissional?.id ?? null,
         inicio: horario,
         nome: String(formData.get("nome") ?? ""),
         whatsapp: String(formData.get("whatsapp") ?? ""),
-        placa,
-        modelo: String(formData.get("modelo") ?? ""),
         observacoes: String(formData.get("observacoes") ?? ""),
       });
       if (!resultado.ok) {
@@ -129,9 +139,34 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
         </ul>
       </Etapa>
 
-      {servico && (
+      {servico && variasProfissionais && (
+        <div ref={refProfissional} className="scroll-mt-4">
+          <Etapa numero={2} titulo="Com quem?">
+            <div className="grid grid-cols-2 gap-2">
+              {[null, ...agenda.profissionais].map((opcao) => {
+                const ativo = profissional !== undefined && (opcao?.id ?? null) === (profissional?.id ?? null);
+                return (
+                  <button
+                    key={opcao?.id ?? "qualquer"}
+                    type="button"
+                    onClick={() => escolherProfissional(opcao)}
+                    aria-pressed={ativo}
+                    className={`min-h-12 rounded-2xl border px-3 py-2.5 text-sm font-semibold transition-colors ${
+                      ativo ? "border-texto bg-texto text-fundo" : "border-borda bg-elevado/50 hover:border-prata/50"
+                    } ${opcao === null ? "col-span-2" : ""}`}
+                  >
+                    {opcao ? opcao.nome : "Sem preferência (primeira livre)"}
+                  </button>
+                );
+              })}
+            </div>
+          </Etapa>
+        </div>
+      )}
+
+      {prontoParaHorario && (
         <div ref={refHorarios} className="scroll-mt-4">
-          <Etapa numero={2} titulo="Dia e horário">
+          <Etapa numero={numeroHorario} titulo="Dia e horário">
             <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
               {dias.map(({ dia, disponivel }) => {
                 const ativo = dia === data;
@@ -189,28 +224,17 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
 
       {servico && horario && data && (
         <div ref={refDados} className="scroll-mt-4">
-          <Etapa numero={3} titulo="Seus dados">
+          <Etapa numero={numeroHorario + 1} titulo="Seus dados">
             <div className="rounded-2xl border border-borda bg-black/40 px-4 py-3 text-sm">
               <p className="font-semibold">{servico.nome}</p>
               <p className="text-suave">
                 {rotuloDataLonga(data)}, às {horaNoFuso(horario, agenda.fuso)} · {formatarMoeda(Number(servico.preco))}
               </p>
+              {variasProfissionais && <p className="text-suave">{profissional ? `Com ${profissional.nome}` : "Com a primeira profissional livre"}</p>}
             </div>
             <form action={enviar} className="grid gap-4">
               <Campo rotulo="Nome" name="nome" autoComplete="name" required />
               <Campo rotulo="WhatsApp" name="whatsapp" inputMode="tel" autoComplete="tel" placeholder="(84) 99999-9999" required />
-              <div className="grid grid-cols-2 gap-3">
-                <Campo
-                  rotulo="Placa (opcional)"
-                  name="placa"
-                  value={placa}
-                  onChange={(evento) => setPlaca(normalizarPlaca(evento.target.value).slice(0, 7))}
-                  autoCapitalize="characters"
-                  placeholder="ABC1D23"
-                  className="font-mono tracking-widest uppercase"
-                />
-                <Campo rotulo="Modelo (opcional)" name="modelo" placeholder="Onix, HB20..." />
-              </div>
               <label className="grid gap-1.5">
                 <span className="text-xs font-medium text-suave">Observações (opcional)</span>
                 <textarea

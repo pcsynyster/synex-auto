@@ -29,7 +29,7 @@ export function FormPix({ chave, titular }: { chave: string | null; titular: str
         setValor("");
         setNome("");
       } else if (resultado.dados) setValor(exibirChavePix(resultado.dados));
-      setMensagem({ ok: true, texto: remover ? "Pix removido." : "Pix salvo. Ele vai junto quando você avisar que o carro está pronto." });
+      setMensagem({ ok: true, texto: remover ? "Pix removido." : "Pix salvo. Ele vai junto na mensagem de agradecimento depois do atendimento." });
     });
   }
 

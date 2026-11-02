@@ -31,12 +31,12 @@ export function FormConvite() {
   return (
     <section className="cartao grid grid-cols-1 gap-4 p-4">
       <div>
-        <h2 className="text-sm font-semibold">Autorizar nova estética</h2>
+        <h2 className="text-sm font-semibold">Autorizar novo salão</h2>
         <p className="text-xs text-suave">Só e-mails autorizados aqui conseguem criar conta.</p>
       </div>
       <form key={chave} action={enviar} className="grid grid-cols-1 gap-3">
         <Campo rotulo="E-mail do dono" name="email" type="email" autoComplete="off" required />
-        <Campo rotulo="Nome da estética (opcional)" name="nome_empresa" autoComplete="off" />
+        <Campo rotulo="Nome do salão (opcional)" name="nome_empresa" autoComplete="off" />
         <div className="grid grid-cols-2 gap-3">
           <Campo rotulo="Dias de teste" name="dias_teste" type="number" min={0} max={90} defaultValue={14} inputMode="numeric" />
           <Campo rotulo="Mensalidade (R$)" name="valor_mensal" defaultValue="99" inputMode="decimal" />

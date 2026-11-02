@@ -31,7 +31,7 @@ export default async function LayoutPainel({ children }: { children: React.React
           <Link href="/painel" className="flex min-w-0 items-center gap-3">
             <SimboloSynex className="w-8 shrink-0" />
             <span className="min-w-0">
-              <span className="block text-[11px] font-medium uppercase tracking-[0.2em] text-suave">Synex Auto</span>
+              <span className="block text-[11px] font-medium uppercase tracking-[0.2em] text-suave">Agenda online</span>
               <span className="block truncate text-sm font-semibold">{ctx.tenant.nome}</span>
             </span>
           </Link>
@@ -60,10 +60,10 @@ export default async function LayoutPainel({ children }: { children: React.React
           <p className="text-xs text-suave">
             {situacao.ativa
               ? "Fale com a Synex para ativar a mensalidade e continuar usando sem interrupção."
-              : "Você ainda consulta os serviços, mas não abre novas OS e a agenda online fica fechada para clientes. Regularize para voltar ao normal."}
+              : "Você ainda consulta a agenda, mas o link de agendamento fica fechado para clientes. Regularize para voltar ao normal."}
           </p>
           <a
-            href={linkWhatsapp(WHATSAPP_SYNEX, `Olá! Quero ${situacao.ativa ? "ativar" : "renovar"} a mensalidade da Synex Auto da ${ctx.tenant.nome}.`)}
+            href={linkWhatsapp(WHATSAPP_SYNEX, `Olá! Quero ${situacao.ativa ? "ativar" : "renovar"} a mensalidade da agenda Synex do ${ctx.tenant.nome}.`)}
             className="flex h-10 items-center justify-center rounded-full bg-texto text-sm font-semibold text-fundo"
           >
             Falar com a Synex
