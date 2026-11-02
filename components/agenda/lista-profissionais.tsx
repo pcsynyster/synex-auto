@@ -30,7 +30,7 @@ function Linha({ item }: { item: Profissional }) {
           className="h-10 min-w-0 flex-1 rounded-xl border border-borda bg-elevado px-3 text-sm focus:border-prata focus:outline-none"
         />
         {mudou ? (
-          <button type="button" onClick={() => salvar({ nome })} disabled={pendente} className="h-10 shrink-0 rounded-full bg-rosa px-4 text-xs font-semibold text-white">
+          <button type="button" onClick={() => salvar({ nome })} disabled={pendente} className="h-10 shrink-0 rounded-full brilho px-4 text-xs font-semibold text-white">
             Salvar
           </button>
         ) : (
@@ -78,7 +78,7 @@ export function ListaProfissionais({ profissionais }: { profissionais: Profissio
           maxLength={60}
           className="h-11 min-w-0 flex-1 rounded-xl border border-borda bg-elevado px-3 text-sm focus:border-prata focus:outline-none"
         />
-        <button type="button" onClick={adicionar} disabled={pendente || nome.trim().length < 2} className="h-11 shrink-0 rounded-full bg-rosa px-4 text-sm font-semibold text-white disabled:opacity-40">
+        <button type="button" onClick={adicionar} disabled={pendente || nome.trim().length < 2} className="h-11 shrink-0 rounded-full brilho px-4 text-sm font-semibold text-white disabled:opacity-40">
           Adicionar
         </button>
       </div>

@@ -29,7 +29,7 @@ export function AbasPainel({ pendentes }: { pendentes: number }) {
             {aba.href === "/painel/agenda" && pendentes > 0 && (
               <span
                 className={`grid min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-semibold ${
-                  ativa ? "bg-rosa text-white" : "bg-rosa text-white"
+                  ativa ? "brilho text-white" : "brilho text-white"
                 }`}
               >
                 {pendentes}

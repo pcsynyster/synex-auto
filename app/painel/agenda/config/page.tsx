@@ -55,7 +55,7 @@ export default async function PaginaConfigAgenda() {
   return (
     <div className="grid grid-cols-1 gap-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Ajustes do salão</h1>
+        <h1 className="texto-prata text-2xl font-semibold tracking-tight">Ajustes do salão</h1>
       </div>
       <section className="cartao p-4">
         <h2 className="mb-3 text-sm font-semibold">Logo do salão</h2>

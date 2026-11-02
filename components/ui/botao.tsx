@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes } from "react";
 type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & { variante?: "primario" | "secundario" };
 
 const VARIANTES = {
-  primario: "bg-rosa text-white hover:bg-rosa-escuro",
+  primario: "brilho reluz text-white hover:brightness-110",
   secundario: "border border-borda bg-elevado/60 text-texto hover:border-prata/50",
 };
 
@@ -11,7 +11,7 @@ export function Botao({ variante = "primario", className = "", ...props }: Botao
   return (
     <button
       {...props}
-      className={`h-12 rounded-full px-5 text-sm font-semibold transition-[transform,background-color,border-color] active:scale-[0.98] disabled:opacity-50 ${VARIANTES[variante]} ${className}`}
+      className={`h-12 rounded-full px-5 text-sm font-semibold transition-[transform,filter,border-color] active:scale-[0.98] disabled:opacity-50 ${VARIANTES[variante]} ${className}`}
     />
   );
 }

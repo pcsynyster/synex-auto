@@ -19,7 +19,7 @@ export function CopiarLink({ link }: { link: string }) {
     <button
       type="button"
       onClick={copiar}
-      className="h-10 shrink-0 rounded-full bg-rosa px-4 text-sm font-semibold text-white transition-colors hover:bg-rosa-escuro"
+      className="h-10 shrink-0 rounded-full brilho px-4 text-sm font-semibold text-white transition-colors hover:brightness-110"
     >
       {copiado ? "Copiado" : "Copiar"}
     </button>

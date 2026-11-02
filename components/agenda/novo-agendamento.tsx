@@ -102,7 +102,7 @@ export function NovoAgendamento({ servicos, profissionais, hoje, dataInicial, fu
                 key={opcao.id}
                 type="button"
                 onClick={() => setServicoId(opcao.id)}
-                className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left ${ativo ? "border-rosa bg-rosa text-white" : "border-borda bg-elevado/50"}`}
+                className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left ${ativo ? "brilho text-white" : "border-borda bg-elevado/50"}`}
               >
                 <span className="min-w-0">
                   <span className="block text-sm font-semibold">{opcao.nome}</span>
@@ -126,7 +126,7 @@ export function NovoAgendamento({ servicos, profissionais, hoje, dataInicial, fu
                   key={opcao?.id ?? "qualquer"}
                   type="button"
                   onClick={() => setProfissionalId(opcao?.id ?? null)}
-                  className={`min-h-11 rounded-2xl border px-3 text-sm font-semibold ${ativo ? "border-rosa bg-rosa text-white" : "border-borda bg-elevado/50"} ${opcao ? "" : "col-span-2"}`}
+                  className={`min-h-11 rounded-2xl border px-3 text-sm font-semibold ${ativo ? "brilho text-white" : "border-borda bg-elevado/50"} ${opcao ? "" : "col-span-2"}`}
                 >
                   {opcao ? opcao.nome : "Primeira livre"}
                 </button>
@@ -147,7 +147,7 @@ export function NovoAgendamento({ servicos, profissionais, hoje, dataInicial, fu
                 key={opcao}
                 type="button"
                 onClick={() => setData(opcao)}
-                className={`flex w-14 shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl border py-2.5 ${ativo ? "border-rosa bg-rosa text-white" : "border-borda bg-elevado/50"}`}
+                className={`flex w-14 shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl border py-2.5 ${ativo ? "brilho text-white" : "border-borda bg-elevado/50"}`}
               >
                 <span className={`text-[11px] ${ativo ? "text-white/60" : "text-suave"}`}>{opcao === hoje ? "Hoje" : rotuloDiaCurto(opcao)}</span>
                 <span className="text-lg font-semibold">{diaDoMes(opcao)}</span>
@@ -170,7 +170,7 @@ export function NovoAgendamento({ servicos, profissionais, hoje, dataInicial, fu
                 key={opcao}
                 type="button"
                 onClick={() => setHorario(opcao)}
-                className={`h-11 rounded-full border font-mono text-sm ${opcao === horario ? "border-rosa bg-rosa font-semibold text-white" : "border-borda bg-elevado/50"}`}
+                className={`h-11 rounded-full border font-mono text-sm ${opcao === horario ? "brilho font-semibold text-white" : "border-borda bg-elevado/50"}`}
               >
                 {horaNoFuso(opcao, fuso)}
               </button>

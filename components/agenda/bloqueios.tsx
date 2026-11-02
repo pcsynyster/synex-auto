@@ -68,7 +68,7 @@ export function Bloqueios({ bloqueios, hoje, profissionais }: { bloqueios: Bloqu
       <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
         <input type="date" min={hoje} value={data} onChange={(evento) => setData(evento.target.value)} className={campo} aria-label="Data" />
         <input value={motivo} onChange={(evento) => setMotivo(evento.target.value)} placeholder="Motivo" maxLength={120} className={campo} />
-        <button type="button" onClick={adicionar} disabled={!data || pendente} className="h-11 rounded-full bg-rosa px-4 text-sm font-semibold text-white disabled:opacity-40">
+        <button type="button" onClick={adicionar} disabled={!data || pendente} className="h-11 rounded-full brilho px-4 text-sm font-semibold text-white disabled:opacity-40">
           Fechar
         </button>
       </div>

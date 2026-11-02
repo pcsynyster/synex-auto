@@ -19,7 +19,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <div className="aurora" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        {children}
+      </body>
     </html>
   );
 }

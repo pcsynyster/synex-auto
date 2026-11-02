@@ -37,7 +37,7 @@ export default async function LayoutPainel({ children }: { children: React.React
           </Link>
           <span className="flex shrink-0 items-center gap-2">
             {admin === true && (
-              <Link href="/admin" className="rounded-full bg-rosa px-3.5 py-1.5 text-xs font-semibold text-white">
+              <Link href="/admin" className="rounded-full brilho px-3.5 py-1.5 text-xs font-semibold text-white">
                 Admin
               </Link>
             )}
@@ -64,7 +64,7 @@ export default async function LayoutPainel({ children }: { children: React.React
           </p>
           <a
             href={linkWhatsapp(WHATSAPP_SYNEX, `Olá! Quero ${situacao.ativa ? "ativar" : "renovar"} a mensalidade da agenda Synex do ${ctx.tenant.nome}.`)}
-            className="flex h-10 items-center justify-center rounded-full bg-rosa text-sm font-semibold text-white"
+            className="flex h-10 items-center justify-center rounded-full brilho text-sm font-semibold text-white"
           >
             Falar com a Synex
           </a>

@@ -63,7 +63,7 @@ export function EditarLink({ appUrl, slug, sugestao, tenantId, compacto = false 
             type="button"
             onClick={salvar}
             disabled={pendente || valor.length < 3}
-            className="h-10 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50"
+            className="h-10 rounded-full brilho text-sm font-semibold text-white disabled:opacity-50"
           >
             {pendente ? "Salvando..." : "Salvar link"}
           </button>

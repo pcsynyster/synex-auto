@@ -10,6 +10,7 @@ import { formatarMoeda } from "@/lib/formato";
 import { criarClienteAnonimo } from "@/lib/supabase/anon";
 import { linkWhatsapp } from "@/lib/telefone";
 import { imagensCompartilhamento, urlLogo } from "@/lib/logo";
+import { Brilhos } from "@/components/ui/brilhos";
 import { LogoLoja } from "@/components/ui/logo-loja";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ token: st
 
 const ESTILO_STATUS = {
   pendente: "border border-borda text-texto",
-  confirmado: "bg-rosa text-white",
+  confirmado: "brilho text-white",
   concluido: "border border-borda text-suave",
   cancelado: "border border-borda text-suave line-through",
   nao_compareceu: "border border-borda text-suave",
@@ -59,15 +60,21 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
         </div>
       </header>
 
-      <section className="cartao grid grid-cols-1 gap-5 p-5">
-        <span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${ESTILO_STATUS[agendamento.status]}`}>
+      <section className={`grid grid-cols-1 gap-4 p-5 ${ativo ? "destaque-hero" : "cartao"}`}>
+        {ativo && <Brilhos />}
+        <span className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${ativo ? "bg-white/25 text-white ring-1 ring-white/45 backdrop-blur" : ESTILO_STATUS[agendamento.status]}`}>
           {ROTULO_STATUS_AGENDAMENTO[agendamento.status]}
         </span>
         <div>
-          <p className="texto-prata text-[2.5rem] leading-none font-semibold tabular-nums">{horaNoFuso(agendamento.inicio, agendamento.fuso)}</p>
-          <p className="mt-2 text-base">{rotuloDataLonga(data_)}</p>
+          <p className={`text-[3.25rem] leading-none font-semibold tracking-tight tabular-nums ${ativo ? "[text-shadow:0_4px_24px_rgba(120,0,70,0.35)]" : "texto-prata"}`}>
+            {horaNoFuso(agendamento.inicio, agendamento.fuso)}
+          </p>
+          <p className={`mt-2 text-base ${ativo ? "text-white/90" : ""}`}>{rotuloDataLonga(data_)}</p>
         </div>
-        <dl className="grid gap-2 border-t border-borda pt-4 text-sm">
+      </section>
+
+      <section className="cartao grid grid-cols-1 gap-5 p-5">
+        <dl className="grid gap-2 text-sm">
           <div className="flex justify-between gap-4">
             <dt className="text-suave">Serviço</dt>
             <dd className="text-right">{agendamento.servico}</dd>
@@ -115,7 +122,7 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
         {!ativo && (
           <Link
             href={`/${agendamento.slug}`}
-            className="flex h-12 items-center justify-center rounded-full bg-rosa text-sm font-semibold text-white"
+            className="flex h-12 items-center justify-center rounded-full brilho text-sm font-semibold text-white"
           >
             Agendar novo horário
           </Link>

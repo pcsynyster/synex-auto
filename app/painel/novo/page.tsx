@@ -23,7 +23,7 @@ export default async function PaginaNovoAgendamento({ searchParams }: { searchPa
   return (
     <div className="grid grid-cols-1 gap-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Novo agendamento</h1>
+        <h1 className="texto-prata text-2xl font-semibold tracking-tight">Novo agendamento</h1>
         <Link href="/painel/agenda" className="text-xs text-suave">
           Voltar
         </Link>

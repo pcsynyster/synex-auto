@@ -57,7 +57,7 @@ function Editor({ servico, aoFechar }: { servico: ServicoLista | null; aoFechar:
         <button type="button" onClick={aoFechar} className="h-10 rounded-full border border-borda text-sm">
           Cancelar
         </button>
-        <button type="button" onClick={salvar} disabled={pendente} className="h-10 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50">
+        <button type="button" onClick={salvar} disabled={pendente} className="h-10 rounded-full brilho text-sm font-semibold text-white disabled:opacity-50">
           {pendente ? "Salvando..." : "Salvar"}
         </button>
       </div>

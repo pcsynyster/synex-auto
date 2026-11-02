@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { AgendarCliente } from "@/components/agenda/agendar-cliente";
+import { Brilhos } from "@/components/ui/brilhos";
 import { RodapeSynex } from "@/components/ui/rodape-synex";
 import { PADRAO_SLUG, type AgendaPublica } from "@/lib/agenda";
 import { criarClienteAnonimo } from "@/lib/supabase/anon";
@@ -39,21 +40,31 @@ export default async function PaginaAgendar({ params }: { params: Promise<{ slug
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-6 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
-      <header className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <LogoLoja url={urlLogo(agenda.slug, agenda.logo_versao)} nome={agenda.nome} />
-          <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-suave">Agendamento online</p>
-          <h1 className="mt-1 text-2xl leading-tight font-semibold">{agenda.nome}</h1>
-          {agenda.cidade && <p className="mt-1 text-sm text-suave">{agenda.cidade}</p>}
+      <header className="destaque-hero grid gap-5 p-5">
+        <Brilhos />
+        <div className="flex items-start justify-between gap-3">
+          <div className="rounded-[1.15rem] bg-white/30 p-1 shadow-[0_0_0_1px_rgba(255,255,255,0.55),0_12px_30px_-8px_rgba(90,0,60,0.55)]">
+            <LogoLoja url={urlLogo(agenda.slug, agenda.logo_versao)} nome={agenda.nome} />
           </div>
+          <a
+            href={linkWhatsapp(agenda.telefone)}
+            className="shrink-0 rounded-full bg-white/20 px-3.5 py-1.5 text-sm font-medium text-white ring-1 ring-white/45 backdrop-blur transition-colors hover:bg-white/30"
+          >
+            WhatsApp
+          </a>
         </div>
-        <a
-          href={linkWhatsapp(agenda.telefone)}
-          className="shrink-0 rounded-full border border-borda bg-elevado/60 px-3.5 py-1.5 text-sm text-texto transition-colors hover:border-prata/60"
-        >
-          WhatsApp
-        </a>
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/80">Agendamento online</p>
+          <h1 className="mt-1.5 text-[2rem] leading-[1.05] font-semibold tracking-tight [text-shadow:0_2px_18px_rgba(120,0,70,0.35)]">{agenda.nome}</h1>
+          {agenda.cidade && <p className="mt-1.5 text-sm text-white/85">{agenda.cidade}</p>}
+        </div>
+        <ul className="flex flex-wrap gap-2 text-xs font-medium">
+          {["Marque em 1 minuto", "Confirmação no WhatsApp", ...(agenda.profissionais.length > 1 ? ["Escolha sua profissional"] : [])].map((item) => (
+            <li key={item} className="rounded-full bg-white/20 px-3 py-1.5 ring-1 ring-white/40 backdrop-blur">
+              {item}
+            </li>
+          ))}
+        </ul>
       </header>
 
       {agenda.servicos.length > 0 ? (

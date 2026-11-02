@@ -44,7 +44,7 @@ export function FormPix({ chave, titular }: { chave: string | null; titular: str
               setTipo(opcao.id);
               setMensagem(null);
             }}
-            className={`h-9 rounded-full text-[12px] font-medium ${tipo === opcao.id ? "bg-rosa text-white" : "text-suave"}`}
+            className={`h-9 rounded-full text-[12px] font-medium ${tipo === opcao.id ? "brilho text-white" : "text-suave"}`}
           >
             {opcao.rotulo}
           </button>
@@ -89,7 +89,7 @@ export function FormPix({ chave, titular }: { chave: string | null; titular: str
           type="button"
           onClick={() => salvar()}
           disabled={pendente || valor.trim() === ""}
-          className="h-11 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50"
+          className="h-11 rounded-full brilho text-sm font-semibold text-white disabled:opacity-50"
         >
           {pendente ? "Salvando..." : "Salvar Pix"}
         </button>
