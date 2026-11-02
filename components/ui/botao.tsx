@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes } from "react";
 type BotaoProps = ButtonHTMLAttributes<HTMLButtonElement> & { variante?: "primario" | "secundario" };
 
 const VARIANTES = {
-  primario: "bg-texto text-fundo hover:bg-white",
+  primario: "bg-rosa text-white hover:bg-rosa-escuro",
   secundario: "border border-borda bg-elevado/60 text-texto hover:border-prata/50",
 };
 

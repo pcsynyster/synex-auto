@@ -19,8 +19,8 @@ const ROTULO_ACAO: Record<Acao, string> = {
 };
 
 const ESTILO_STATUS: Record<Agendamento["status"], string> = {
-  pendente: "border border-texto/70 text-texto",
-  confirmado: "bg-texto text-fundo",
+  pendente: "border border-rosa/70 text-texto",
+  confirmado: "bg-rosa text-white",
   concluido: "border border-borda text-suave",
   cancelado: "border border-borda text-suave",
   nao_compareceu: "border border-borda text-suave",
@@ -79,7 +79,7 @@ export function CartaoAgendamento(props: Props) {
             <span className="rounded-full border border-borda px-2 py-0.5 text-xs text-texto">{profissional}</span>
           </p>
         )}
-        {observacoes && <p className="mt-1 rounded-xl bg-black/40 px-3 py-2 text-xs text-suave">{observacoes}</p>}
+        {observacoes && <p className="mt-1 rounded-xl bg-elevado px-3 py-2 text-xs text-suave">{observacoes}</p>}
       </div>
 
       {aviso && <p className="text-xs text-alerta">{aviso}</p>}
@@ -107,7 +107,7 @@ export function CartaoAgendamento(props: Props) {
             type="button"
             onClick={() => executar(confirmar)}
             disabled={pendente}
-            className="h-11 rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50"
+            className="h-11 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50"
           >
             {pendente ? "Salvando..." : ROTULO_ACAO[confirmar]}
           </button>
@@ -121,7 +121,7 @@ export function CartaoAgendamento(props: Props) {
             type="button"
             onClick={() => executar("confirmado")}
             disabled={pendente}
-            className="h-11 rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50"
+            className="h-11 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50"
           >
             {pendente ? "Confirmando..." : "Confirmar"}
           </button>
@@ -132,7 +132,7 @@ export function CartaoAgendamento(props: Props) {
             type="button"
             onClick={() => executar("concluido")}
             disabled={pendente}
-            className="flex h-11 items-center justify-center rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50"
+            className="flex h-11 items-center justify-center rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50"
           >
             {pendente ? "Salvando..." : "Marcar como atendida"}
           </button>

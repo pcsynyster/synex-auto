@@ -57,7 +57,7 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
         </div>
         <span
           className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-            situacao.ativa ? (estetica.status_assinatura === "ativa" ? "bg-texto text-fundo" : "border border-borda text-texto") : "bg-alerta text-fundo"
+            situacao.ativa ? (estetica.status_assinatura === "ativa" ? "bg-rosa text-white" : "border border-borda text-texto") : "bg-alerta text-white"
           }`}
         >
           {situacao.rotulo}
@@ -93,7 +93,7 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
             type="button"
             disabled={pendente}
             onClick={() => executar(() => definirStatusAssinatura(estetica.id, "inadimplente"))}
-            className="h-11 rounded-full bg-alerta text-sm font-semibold text-fundo disabled:opacity-50"
+            className="h-11 rounded-full bg-alerta text-sm font-semibold text-white disabled:opacity-50"
           >
             Bloquear acesso
           </button>
@@ -104,7 +104,7 @@ export function CartaoEstetica({ estetica, hoje, appUrl }: { estetica: Estetica;
             type="button"
             disabled={pendente}
             onClick={() => executar(() => registrarPagamento(estetica.id, 30))}
-            className="h-11 rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50"
+            className="h-11 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50"
           >
             {pendente ? "Salvando..." : "Pagou: liberar +30 dias"}
           </button>

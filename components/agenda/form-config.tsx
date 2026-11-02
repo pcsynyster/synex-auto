@@ -35,9 +35,9 @@ function Interruptor({ ligado, aoMudar, rotulo }: { ligado: boolean; aoMudar: (v
       aria-checked={ligado}
       aria-label={rotulo}
       onClick={() => aoMudar(!ligado)}
-      className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${ligado ? "bg-texto" : "bg-borda"}`}
+      className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${ligado ? "bg-rosa" : "bg-borda"}`}
     >
-      <span className={`absolute top-1 size-5 rounded-full transition-all ${ligado ? "left-6 bg-fundo" : "left-1 bg-suave"}`} />
+      <span className={`absolute top-1 size-5 rounded-full transition-all ${ligado ? "left-6 bg-white shadow-sm" : "left-1 bg-white shadow-sm"}`} />
     </button>
   );
 }
@@ -146,7 +146,7 @@ export function FormConfigAgenda({ inicial }: { inicial: ConfigAgenda }) {
                 type="button"
                 onClick={() => alterar("intervalo_agenda_min", opcao)}
                 className={`h-10 rounded-full border text-sm transition-colors ${
-                  config.intervalo_agenda_min === opcao ? "border-texto bg-texto font-semibold text-fundo" : "border-borda text-suave"
+                  config.intervalo_agenda_min === opcao ? "border-rosa bg-rosa font-semibold text-white" : "border-borda text-suave"
                 }`}
               >
                 {opcao}

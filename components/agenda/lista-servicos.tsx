@@ -34,7 +34,7 @@ function Editor({ servico, aoFechar }: { servico: ServicoLista | null; aoFechar:
   const campo = "h-11 w-full min-w-0 rounded-xl border border-borda bg-elevado px-3 text-sm focus:border-prata focus:outline-none";
 
   return (
-    <div className="grid gap-3 rounded-2xl border border-prata/40 bg-black/40 p-3">
+    <div className="grid gap-3 rounded-2xl border border-prata/40 bg-elevado p-3">
       <input value={nome} onChange={(evento) => setNome(evento.target.value)} placeholder="Nome do serviço" className={campo} autoFocus />
       <div className="grid grid-cols-2 gap-2">
         <label className="grid gap-1">
@@ -48,7 +48,7 @@ function Editor({ servico, aoFechar }: { servico: ServicoLista | null; aoFechar:
       </div>
       {servico && (
         <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={ativo} onChange={(evento) => setAtivo(evento.target.checked)} className="size-4 accent-white" />
+          <input type="checkbox" checked={ativo} onChange={(evento) => setAtivo(evento.target.checked)} className="size-4 accent-rosa" />
           Aparece na agenda online
         </label>
       )}
@@ -57,7 +57,7 @@ function Editor({ servico, aoFechar }: { servico: ServicoLista | null; aoFechar:
         <button type="button" onClick={aoFechar} className="h-10 rounded-full border border-borda text-sm">
           Cancelar
         </button>
-        <button type="button" onClick={salvar} disabled={pendente} className="h-10 rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50">
+        <button type="button" onClick={salvar} disabled={pendente} className="h-10 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50">
           {pendente ? "Salvando..." : "Salvar"}
         </button>
       </div>

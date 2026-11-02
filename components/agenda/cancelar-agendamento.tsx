@@ -35,7 +35,7 @@ export function CancelarAgendamento({ token }: { token: string }) {
         <button type="button" onClick={() => setConfirmando(false)} className="h-11 rounded-full border border-borda text-sm">
           Manter
         </button>
-        <button type="button" onClick={cancelar} disabled={pendente} className="h-11 rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50">
+        <button type="button" onClick={cancelar} disabled={pendente} className="h-11 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50">
           {pendente ? "Cancelando..." : "Sim, cancelar"}
         </button>
       </div>

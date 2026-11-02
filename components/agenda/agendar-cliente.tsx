@@ -13,7 +13,7 @@ function Etapa({ numero, titulo, children }: { numero: number; titulo: string; c
   return (
     <section className="cartao grid grid-cols-1 gap-4 p-4">
       <h2 className="flex items-center gap-3 text-sm font-semibold">
-        <span className="grid size-6 place-items-center rounded-full bg-texto text-xs text-fundo">{numero}</span>
+        <span className="grid size-6 place-items-center rounded-full bg-rosa text-xs text-white">{numero}</span>
         {titulo}
       </h2>
       {children}
@@ -121,12 +121,12 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
                   onClick={() => escolherServico(opcao)}
                   aria-pressed={ativo}
                   className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-left transition-colors ${
-                    ativo ? "border-texto bg-texto text-fundo" : "border-borda bg-elevado/50 hover:border-prata/50"
+                    ativo ? "border-rosa bg-rosa text-white" : "border-borda bg-elevado/50 hover:border-prata/50"
                   }`}
                 >
                   <span className="min-w-0">
                     <span className="block font-semibold">{opcao.nome}</span>
-                    <span className={`block text-xs ${ativo ? "text-fundo/60" : "text-suave"}`}>
+                    <span className={`block text-xs ${ativo ? "text-white/60" : "text-suave"}`}>
                       {formatarDuracao(opcao.duracao_min)}
                       {opcao.descricao ? ` · ${opcao.descricao}` : ""}
                     </span>
@@ -152,7 +152,7 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
                     onClick={() => escolherProfissional(opcao)}
                     aria-pressed={ativo}
                     className={`min-h-12 rounded-2xl border px-3 py-2.5 text-sm font-semibold transition-colors ${
-                      ativo ? "border-texto bg-texto text-fundo" : "border-borda bg-elevado/50 hover:border-prata/50"
+                      ativo ? "border-rosa bg-rosa text-white" : "border-borda bg-elevado/50 hover:border-prata/50"
                     } ${opcao === null ? "col-span-2" : ""}`}
                   >
                     {opcao ? opcao.nome : "Sem preferência (primeira livre)"}
@@ -177,10 +177,10 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
                     disabled={!disponivel}
                     onClick={() => escolherDia(dia)}
                     className={`flex w-14 shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl border py-2.5 transition-colors disabled:opacity-30 ${
-                      ativo ? "border-texto bg-texto text-fundo" : "border-borda bg-elevado/50"
+                      ativo ? "border-rosa bg-rosa text-white" : "border-borda bg-elevado/50"
                     }`}
                   >
-                    <span className={`text-[11px] ${ativo ? "text-fundo/60" : "text-suave"}`}>{rotuloDiaCurto(dia)}</span>
+                    <span className={`text-[11px] ${ativo ? "text-white/60" : "text-suave"}`}>{rotuloDiaCurto(dia)}</span>
                     <span className="text-lg font-semibold">{diaDoMes(dia)}</span>
                   </button>
                 );
@@ -209,7 +209,7 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
                       type="button"
                       onClick={() => setHorario(opcao)}
                       className={`h-11 rounded-full border font-mono text-sm transition-colors ${
-                        ativo ? "border-texto bg-texto font-semibold text-fundo" : "border-borda bg-elevado/50 hover:border-prata/50"
+                        ativo ? "border-rosa bg-rosa font-semibold text-white" : "border-borda bg-elevado/50 hover:border-prata/50"
                       }`}
                     >
                       {horaNoFuso(opcao, agenda.fuso)}
@@ -225,7 +225,7 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
       {servico && horario && data && (
         <div ref={refDados} className="scroll-mt-4">
           <Etapa numero={numeroHorario + 1} titulo="Seus dados">
-            <div className="rounded-2xl border border-borda bg-black/40 px-4 py-3 text-sm">
+            <div className="rounded-2xl border border-borda bg-elevado px-4 py-3 text-sm">
               <p className="font-semibold">{servico.nome}</p>
               <p className="text-suave">
                 {rotuloDataLonga(data)}, às {horaNoFuso(horario, agenda.fuso)} · {formatarMoeda(Number(servico.preco))}

@@ -63,7 +63,7 @@ export function EditarLink({ appUrl, slug, sugestao, tenantId, compacto = false 
             type="button"
             onClick={salvar}
             disabled={pendente || valor.length < 3}
-            className="h-10 rounded-full bg-texto text-sm font-semibold text-fundo disabled:opacity-50"
+            className="h-10 rounded-full bg-rosa text-sm font-semibold text-white disabled:opacity-50"
           >
             {pendente ? "Salvando..." : "Salvar link"}
           </button>
@@ -76,7 +76,7 @@ export function EditarLink({ appUrl, slug, sugestao, tenantId, compacto = false 
   return (
     <div className="grid gap-2">
       <div className="flex items-center gap-2">
-        <a href={link} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate rounded-full border border-borda bg-black/40 px-4 py-2.5 font-mono text-xs text-suave">
+        <a href={link} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate rounded-full border border-borda bg-elevado px-4 py-2.5 font-mono text-xs text-suave">
           {link.replace(/^https?:\/\//, "")}
         </a>
         <CopiarLink link={link} />

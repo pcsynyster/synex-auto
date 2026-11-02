@@ -84,7 +84,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
             href={href(item.id, lista)}
             aria-current={item.id === periodo ? "page" : undefined}
             className={`shrink-0 rounded-full border px-4 py-2 text-sm transition-colors ${
-              item.id === periodo ? "border-texto bg-texto font-semibold text-fundo" : "border-borda text-suave hover:text-texto"
+              item.id === periodo ? "border-rosa bg-rosa font-semibold text-white" : "border-borda text-suave hover:text-texto"
             }`}
           >
             {item.rotulo}
@@ -181,7 +181,7 @@ export default async function PaginaResumo({ searchParams }: { searchParams: Pro
               href={href(periodo, item.id)}
               aria-current={item.id === lista ? "page" : undefined}
               className={`flex h-9 items-center justify-center rounded-full px-1 text-center text-[12px] leading-tight font-medium ${
-                item.id === lista ? "bg-texto text-fundo" : "text-suave"
+                item.id === lista ? "bg-rosa text-white" : "text-suave"
               }`}
             >
               {item.rotulo}

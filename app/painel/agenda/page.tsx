@@ -73,7 +73,7 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
     <div className="grid grid-cols-1 gap-5">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Agenda</h1>
-        <Link href={`/painel/novo${data !== hoje ? `?data=${data}` : ""}`} className="rounded-full bg-texto px-4 py-2 text-sm font-semibold text-fundo">
+        <Link href={`/painel/novo${data !== hoje ? `?data=${data}` : ""}`} className="rounded-full bg-rosa px-4 py-2 text-sm font-semibold text-white">
           + Novo agendamento
         </Link>
       </div>
@@ -88,7 +88,7 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
                 href={query(data, item.id)}
                 aria-current={ativo ? "page" : undefined}
                 className={`shrink-0 rounded-full border px-4 py-2 text-sm transition-colors ${
-                  ativo ? "border-texto bg-texto font-semibold text-fundo" : "border-borda text-suave hover:text-texto"
+                  ativo ? "border-rosa bg-rosa font-semibold text-white" : "border-borda text-suave hover:text-texto"
                 }`}
               >
                 {item.nome}
@@ -121,14 +121,14 @@ export default async function PaginaAgenda({ searchParams }: { searchParams: Pro
               href={query(opcao, profissionalId)}
               aria-current={ativo ? "date" : undefined}
               className={`relative flex w-14 shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl border py-2.5 transition-colors ${
-                ativo ? "border-texto bg-texto text-fundo" : "border-borda bg-elevado/50"
+                ativo ? "border-rosa bg-rosa text-white" : "border-borda bg-elevado/50"
               }`}
             >
-              <span className={`text-[11px] ${ativo ? "text-fundo/60" : "text-suave"}`}>{opcao === hoje ? "Hoje" : rotuloDiaCurto(opcao)}</span>
+              <span className={`text-[11px] ${ativo ? "text-white/60" : "text-suave"}`}>{opcao === hoje ? "Hoje" : rotuloDiaCurto(opcao)}</span>
               <span className="text-lg font-semibold">{diaDoMes(opcao)}</span>
-              <span className={`h-4 text-[10px] font-semibold ${ativo ? "text-fundo/70" : "text-suave"}`}>{resumo ? resumo.total : ""}</span>
+              <span className={`h-4 text-[10px] font-semibold ${ativo ? "text-white/70" : "text-suave"}`}>{resumo ? resumo.total : ""}</span>
               {resumo && resumo.pendentes > 0 && (
-                <span className={`absolute top-1.5 right-1.5 size-1.5 rounded-full ${ativo ? "bg-fundo" : "bg-texto"}`} aria-label="Tem pendentes" />
+                <span className={`absolute top-1.5 right-1.5 size-1.5 rounded-full ${ativo ? "bg-white" : "bg-rosa"}`} aria-label="Tem pendentes" />
               )}
             </Link>
           );

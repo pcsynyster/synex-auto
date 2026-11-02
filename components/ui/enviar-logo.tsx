@@ -71,7 +71,7 @@ export function EnviarLogo({ logoUrl, tenantId, compacto = false }: Props) {
           {previa ? (
             <img src={previa} alt="Logo" className="size-full object-contain" />
           ) : (
-            <span className="text-xs text-fundo/50">Logo</span>
+            <span className="text-xs text-suave">Logo</span>
           )}
         </button>
         <div className="grid min-w-0 gap-1">

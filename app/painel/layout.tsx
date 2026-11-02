@@ -26,7 +26,7 @@ export default async function LayoutPainel({ children }: { children: React.React
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
-      <header className="sticky top-0 z-10 grid gap-3 border-b border-white/[0.06] bg-black/70 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-xl">
+      <header className="sticky top-0 z-10 grid gap-3 border-b border-borda bg-white/80 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-xl">
         <div className="flex items-center justify-between gap-3">
           <Link href="/painel" className="flex min-w-0 items-center gap-3">
             <SimboloSynex className="w-8 shrink-0" />
@@ -37,7 +37,7 @@ export default async function LayoutPainel({ children }: { children: React.React
           </Link>
           <span className="flex shrink-0 items-center gap-2">
             {admin === true && (
-              <Link href="/admin" className="rounded-full bg-texto px-3.5 py-1.5 text-xs font-semibold text-fundo">
+              <Link href="/admin" className="rounded-full bg-rosa px-3.5 py-1.5 text-xs font-semibold text-white">
                 Admin
               </Link>
             )}
@@ -64,7 +64,7 @@ export default async function LayoutPainel({ children }: { children: React.React
           </p>
           <a
             href={linkWhatsapp(WHATSAPP_SYNEX, `Olá! Quero ${situacao.ativa ? "ativar" : "renovar"} a mensalidade da agenda Synex do ${ctx.tenant.nome}.`)}
-            className="flex h-10 items-center justify-center rounded-full bg-texto text-sm font-semibold text-fundo"
+            className="flex h-10 items-center justify-center rounded-full bg-rosa text-sm font-semibold text-white"
           >
             Falar com a Synex
           </a>

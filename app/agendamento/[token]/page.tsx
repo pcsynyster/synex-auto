@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ token: st
 
 const ESTILO_STATUS = {
   pendente: "border border-borda text-texto",
-  confirmado: "bg-texto text-fundo",
+  confirmado: "bg-rosa text-white",
   concluido: "border border-borda text-suave",
   cancelado: "border border-borda text-suave line-through",
   nao_compareceu: "border border-borda text-suave",
@@ -88,7 +88,7 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
           </div>
         </dl>
         {agendamento.status === "pendente" && (
-          <p className="rounded-2xl border border-borda bg-black/40 px-4 py-3 text-sm text-suave">
+          <p className="rounded-2xl border border-borda bg-elevado px-4 py-3 text-sm text-suave">
             O salão vai confirmar seu horário e você recebe a confirmação pelo WhatsApp.
           </p>
         )}
@@ -115,7 +115,7 @@ export default async function PaginaAgendamento({ params }: { params: Promise<{ 
         {!ativo && (
           <Link
             href={`/${agendamento.slug}`}
-            className="flex h-12 items-center justify-center rounded-full bg-texto text-sm font-semibold text-fundo"
+            className="flex h-12 items-center justify-center rounded-full bg-rosa text-sm font-semibold text-white"
           >
             Agendar novo horário
           </Link>

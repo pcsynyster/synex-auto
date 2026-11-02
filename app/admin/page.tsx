@@ -27,7 +27,7 @@ export default async function PaginaAdmin() {
   ]);
 
   const hoje = hojeNoFuso(FUSO_PADRAO);
-  const lista = esteticas ?? [];
+  const lista = (esteticas ?? []).filter((item) => !item.slug.startsWith("encerrado-"));
   const situacoes = lista.map((item) => situacaoAssinatura(item.status_assinatura, item.assinatura_valida_ate, hoje));
   const pagantes = lista.filter((item, indice) => item.status_assinatura === "ativa" && situacoes[indice]?.ativa);
   const emTeste = lista.filter((item, indice) => item.status_assinatura === "trial" && situacoes[indice]?.ativa).length;
@@ -36,7 +36,7 @@ export default async function PaginaAdmin() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-white/[0.06] bg-black/70 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-xl">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-borda bg-white/80 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-xl">
         <span className="flex items-center gap-3">
           <SimboloSynex className="w-8" />
           <span>

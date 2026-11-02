@@ -22,14 +22,14 @@ export function AbasPainel({ pendentes }: { pendentes: number }) {
             href={aba.href}
             aria-current={ativa ? "page" : undefined}
             className={`flex h-9 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors ${
-              ativa ? "bg-texto text-fundo" : "text-suave hover:text-texto"
+              ativa ? "bg-white text-texto shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-suave hover:text-texto"
             }`}
           >
             {aba.rotulo}
             {aba.href === "/painel/agenda" && pendentes > 0 && (
               <span
                 className={`grid min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-semibold ${
-                  ativa ? "bg-fundo text-texto" : "bg-texto text-fundo"
+                  ativa ? "bg-rosa text-white" : "bg-rosa text-white"
                 }`}
               >
                 {pendentes}
