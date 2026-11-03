@@ -98,7 +98,7 @@ export function mensagemAgendamentoRecebido(dados: DadosAgendamento, confirmado:
   return [
     `Olá, ${dados.cliente}! ${confirmado ? "Seu horário está confirmado" : "Recebemos seu pedido de agendamento"} na ${dados.empresa}.`,
     `${dados.servico}\n${dados.quando}${dados.profissional ? `\nCom ${dados.profissional}` : ""}`,
-    confirmado ? `Detalhes e cancelamento: ${dados.link}` : `Assim que a loja confirmar, você recebe uma mensagem. Acompanhe: ${dados.link}`,
+    confirmado ? `Detalhes e cancelamento: ${dados.link}` : `Assim que o salão confirmar, você recebe uma mensagem. Acompanhe: ${dados.link}`,
   ].join("\n\n");
 }
 
@@ -129,7 +129,7 @@ export function mensagemAtendido(
   dados: { empresa: string; cliente: string; servico: string },
   pagamento: { valor: string; chave: string; titular: string | null } | null,
 ): string {
-  const partes = [`Obrigada pela visita, ${dados.cliente}! Seu ${dados.servico} na ${dados.empresa} ficou pronto.`];
+  const partes = [`Obrigada pela visita, ${dados.cliente}! Seu atendimento na ${dados.empresa} foi concluído.`, dados.servico];
   if (pagamento) {
     partes.push(`Valor: ${pagamento.valor}`);
     partes.push(["Pague pelo Pix:", `Chave: ${pagamento.chave}`, pagamento.titular ? `Titular: ${pagamento.titular}` : ""].filter(Boolean).join("\n"));

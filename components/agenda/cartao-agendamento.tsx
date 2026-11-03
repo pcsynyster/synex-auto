@@ -91,7 +91,7 @@ export function CartaoAgendamento(props: Props) {
             ultimaAcao === "cancelado"
               ? "Avisar cancelamento no WhatsApp"
               : ultimaAcao === "concluido"
-                ? "Enviar agradecimento e Pix no WhatsApp"
+                ? "Enviar agradecimento no WhatsApp"
                 : "Enviar confirmação no WhatsApp"
           }
           aoClicar={() => setLinkAviso(null)}
