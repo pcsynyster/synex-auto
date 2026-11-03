@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { AgendarCliente } from "@/components/agenda/agendar-cliente";
-import { MaoReal } from "@/components/agenda/mao-real";
 import { LogoLoja } from "@/components/ui/logo-loja";
 import { Brilhos } from "@/components/ui/brilhos";
 import type { AgendaPublica } from "@/lib/agenda";
@@ -107,9 +106,8 @@ export function Vitrine({ slug, agenda, logoUrl, linkWhatsapp }: { slug: string;
             key={tom?.nome ?? "inicio"}
             className={`font-serifa animate-[surgir_0.6s_ease] leading-none italic [text-shadow:0_4px_24px_rgba(60,0,30,0.3)] ${tom ? "text-[3.6rem]" : "text-[2.6rem]"}`}
           >
-            {tom ? tom.nome : "Qual cor hoje?"}
+            {tom ? tom.nome : "Cores do momento"}
           </p>
-          <MaoReal cor={tom?.cor ?? null} />
         </div>
 
         <div className="-mx-2 flex items-end justify-between gap-1 px-1">
@@ -117,7 +115,7 @@ export function Vitrine({ slug, agenda, logoUrl, linkWhatsapp }: { slug: string;
             <Vidro key={item.nome} tom={item} ativo={tom?.nome === item.nome} aoEscolher={() => setTom(tom?.nome === item.nome ? null : item)} />
           ))}
         </div>
-        <p className="-mt-1 text-center text-xs text-white/85">Toque num vidrinho para escolher a cor do seu atendimento.</p>
+        <p className="-mt-1 text-center text-xs text-white/85">As cores em alta da estação. Toque para ver.</p>
 
         <ul className="flex flex-wrap gap-2 text-xs font-medium">
           {selos.map((item) => (
@@ -129,7 +127,7 @@ export function Vitrine({ slug, agenda, logoUrl, linkWhatsapp }: { slug: string;
       </header>
 
       {agenda.servicos.length > 0 ? (
-        <AgendarCliente slug={slug} agenda={agenda} cor={tom?.nome ?? null} />
+        <AgendarCliente slug={slug} agenda={agenda} />
       ) : (
         <p className="cartao p-6 text-center text-sm text-suave">Nenhum serviço disponível para agendamento no momento.</p>
       )}

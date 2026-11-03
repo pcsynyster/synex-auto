@@ -23,7 +23,7 @@ function Etapa({ numero, titulo, children }: { numero: number; titulo: string; c
 
 const CATEGORIA_PADRAO = "Serviços";
 
-export function AgendarCliente({ slug, agenda, cor = null }: { slug: string; agenda: AgendaPublica; cor?: string | null }) {
+export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaPublica }) {
   const principais = useMemo(() => agenda.servicos.filter((item) => !item.adicional), [agenda.servicos]);
   const extras = useMemo(() => agenda.servicos.filter((item) => item.adicional), [agenda.servicos]);
   const categorias = useMemo(() => [...new Set(principais.map((item) => item.categoria ?? CATEGORIA_PADRAO))], [principais]);
@@ -98,7 +98,7 @@ export function AgendarCliente({ slug, agenda, cor = null }: { slug: string; age
     if (!servico || !horario) return;
     setErro(null);
     iniciarEnvio(async () => {
-      const observacoes = [cor ? `Cor: ${cor}` : "", String(formData.get("observacoes") ?? "").trim()].filter(Boolean).join(" · ").slice(0, 300);
+      const observacoes = String(formData.get("observacoes") ?? "").trim().slice(0, 300);
       const resultado = await agendar({
         slug,
         adicionais,
@@ -304,7 +304,6 @@ export function AgendarCliente({ slug, agenda, cor = null }: { slug: string; age
               <p className="text-suave">
                 {rotuloDataLonga(data)}, às {horaNoFuso(horario, agenda.fuso)} · {formatarMoeda(total)}
               </p>
-              {cor && <p className="text-suave">Cor escolhida: {cor}</p>}
               {variasProfissionais && <p className="text-suave">{profissional ? `Com ${profissional.nome}` : "Com a primeira profissional livre"}</p>}
             </div>
             <form action={enviar} className="grid gap-4">
