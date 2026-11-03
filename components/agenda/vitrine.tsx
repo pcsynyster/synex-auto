@@ -22,56 +22,6 @@ function iniciais(nome: string): string {
   return ((partes[0]?.[0] ?? "") + (partes.length > 1 ? (partes[partes.length - 1]?.[0] ?? "") : "")).toUpperCase();
 }
 
-const DEDOS = [
-  { cx: 62, topo: 74, largura: 34, giro: -6 },
-  { cx: 106, topo: 40, largura: 38, giro: -2 },
-  { cx: 152, topo: 28, largura: 40, giro: 0 },
-  { cx: 198, topo: 44, largura: 38, giro: 3 },
-  { cx: 246, topo: 100, largura: 40, giro: 16 },
-];
-
-function Mao({ cor }: { cor: string }) {
-  return (
-    <svg viewBox="0 0 300 170" className="h-auto w-full max-w-[19rem]" aria-hidden="true">
-      <defs>
-        <linearGradient id="pele" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f6d6c6" />
-          <stop offset="1" stopColor="#eab9a3" />
-        </linearGradient>
-        <linearGradient id="sumir" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0.55" stopColor="#fff" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0" />
-        </linearGradient>
-        <mask id="mascara-mao">
-          <rect width="300" height="170" fill="url(#sumir)" />
-        </mask>
-      </defs>
-      <g mask="url(#mascara-mao)">
-        <rect x="44" y="128" width="228" height="90" rx="44" fill="url(#pele)" />
-        {DEDOS.map(({ cx, topo, largura, giro }) => {
-          const meia = largura / 2;
-          const unha = `M ${cx - largura * 0.34} ${topo + largura * 0.95} C ${cx - largura * 0.37} ${topo + largura * 0.2} ${cx - largura * 0.12} ${topo - largura * 0.3} ${cx} ${topo - largura * 0.38} C ${cx + largura * 0.12} ${topo - largura * 0.3} ${cx + largura * 0.37} ${topo + largura * 0.2} ${cx + largura * 0.34} ${topo + largura * 0.95} Q ${cx} ${topo + largura * 1.08} ${cx - largura * 0.34} ${topo + largura * 0.95} Z`;
-          return (
-            <g key={cx} transform={`rotate(${giro} ${cx} 170)`}>
-              <rect x={cx - meia} y={topo} width={largura} height={200} rx={meia} fill="url(#pele)" />
-              <rect x={cx - meia + 3} y={topo + 6} width={4} height={60} rx={2} fill="#fff" opacity="0.25" />
-              <path d={unha} style={{ fill: cor, transition: "fill 0.7s ease" }} />
-              <path
-                d={`M ${cx - largura * 0.2} ${topo + largura * 0.6} C ${cx - largura * 0.22} ${topo + largura * 0.1} ${cx - largura * 0.08} ${topo - largura * 0.18} ${cx - largura * 0.02} ${topo - largura * 0.22}`}
-                stroke="#fff"
-                strokeWidth={2.4}
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.55"
-              />
-            </g>
-          );
-        })}
-      </g>
-    </svg>
-  );
-}
-
 function Vidro({ tom, ativo, aoEscolher }: { tom: Tom; ativo: boolean; aoEscolher: () => void }) {
   return (
     <button
@@ -81,7 +31,7 @@ function Vidro({ tom, ativo, aoEscolher }: { tom: Tom; ativo: boolean; aoEscolhe
       aria-label={`Cor ${tom.nome}`}
       className={`group flex flex-col items-center gap-1.5 transition-transform duration-300 ${ativo ? "-translate-y-2" : "hover:-translate-y-1"}`}
     >
-      <svg viewBox="0 0 40 74" className="h-16 w-auto drop-shadow-[0_8px_10px_rgba(60,0,30,0.35)]" aria-hidden="true">
+      <svg viewBox="0 0 40 74" className="h-24 w-auto drop-shadow-[0_14px_14px_rgba(60,0,30,0.4)]" aria-hidden="true">
         <defs>
           <linearGradient id={`vidro-${tom.nome}`} x1="0" y1="0" x2="1" y2="0">
             <stop offset="0" stopColor="#fff" stopOpacity="0.35" />
@@ -158,8 +108,6 @@ export function Vitrine({ slug, agenda, logoUrl, linkWhatsapp }: { slug: string;
           >
             {tom ? tom.nome : "Qual cor hoje?"}
           </p>
-          <Mao cor={tom?.cor ?? "#f2b8c9"} />
-          <p className="-mt-3 text-center text-xs text-white/85">Toque num vidrinho para escolher a cor do seu atendimento.</p>
         </div>
 
         <div className="-mx-2 flex items-end justify-between gap-1 px-1">
@@ -167,6 +115,7 @@ export function Vitrine({ slug, agenda, logoUrl, linkWhatsapp }: { slug: string;
             <Vidro key={item.nome} tom={item} ativo={tom?.nome === item.nome} aoEscolher={() => setTom(tom?.nome === item.nome ? null : item)} />
           ))}
         </div>
+        <p className="-mt-1 text-center text-xs text-white/85">Toque num vidrinho para escolher a cor do seu atendimento.</p>
 
         <ul className="flex flex-wrap gap-2 text-xs font-medium">
           {selos.map((item) => (
