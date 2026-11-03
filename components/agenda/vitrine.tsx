@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AgendarCliente } from "@/components/agenda/agendar-cliente";
+import { MaoReal } from "@/components/agenda/mao-real";
 import { LogoLoja } from "@/components/ui/logo-loja";
 import { Brilhos } from "@/components/ui/brilhos";
 import type { AgendaPublica } from "@/lib/agenda";
@@ -31,7 +32,7 @@ function Vidro({ tom, ativo, aoEscolher }: { tom: Tom; ativo: boolean; aoEscolhe
       aria-label={`Cor ${tom.nome}`}
       className={`group flex flex-col items-center gap-1.5 transition-transform duration-300 ${ativo ? "-translate-y-2" : "hover:-translate-y-1"}`}
     >
-      <svg viewBox="0 0 40 74" className="h-24 w-auto drop-shadow-[0_14px_14px_rgba(60,0,30,0.4)]" aria-hidden="true">
+      <svg viewBox="0 0 40 74" className="h-[4.5rem] w-auto drop-shadow-[0_12px_12px_rgba(60,0,30,0.4)]" aria-hidden="true">
         <defs>
           <linearGradient id={`vidro-${tom.nome}`} x1="0" y1="0" x2="1" y2="0">
             <stop offset="0" stopColor="#fff" stopOpacity="0.35" />
@@ -108,6 +109,7 @@ export function Vitrine({ slug, agenda, logoUrl, linkWhatsapp }: { slug: string;
           >
             {tom ? tom.nome : "Qual cor hoje?"}
           </p>
+          <MaoReal cor={tom?.cor ?? null} />
         </div>
 
         <div className="-mx-2 flex items-end justify-between gap-1 px-1">

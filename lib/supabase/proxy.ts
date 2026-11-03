@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database.types";
 
 const ROTAS_PRIVADAS = ["/painel", "/admin"];
-const ROTAS_PUBLICAS = ["/login", "/agendar", "/agendamento", "/logo", "/manifest.webmanifest", "/brand"];
+const ROTAS_PUBLICAS = ["/login", "/agendar", "/agendamento", "/logo", "/manifest.webmanifest", "/brand", "/vitrine"];
 
 export async function atualizarSessao(request: NextRequest) {
   let response = NextResponse.next({ request });
