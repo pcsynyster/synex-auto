@@ -291,6 +291,8 @@ export type Database = {
           tenant_id: string;
           nome: string;
           descricao: string | null;
+          categoria: string | null;
+          adicional: boolean;
           duracao_min: number;
           preco: number;
           ativo: boolean;
@@ -303,6 +305,8 @@ export type Database = {
           tenant_id: string;
           nome: string;
           descricao?: string | null;
+          categoria?: string | null;
+          adicional?: boolean;
           duracao_min: number;
           preco?: number;
           ativo?: boolean;
@@ -311,6 +315,8 @@ export type Database = {
         Update: {
           nome?: string;
           descricao?: string | null;
+          categoria?: string | null;
+          adicional?: boolean;
           duracao_min?: number;
           preco?: number;
           ativo?: boolean;
@@ -533,6 +539,10 @@ export type Database = {
       horarios_livres_painel: {
         Args: { p_servico_id: string; p_data: string; p_profissional_id?: string };
         Returns: string[];
+      };
+      agendar_publico_com_adicionais: {
+        Args: { p_slug: string; p_servico_id: string; p_profissional_id: string; p_inicio: string; p_nome: string; p_whatsapp: string; p_observacoes: string; p_adicionais: string[] };
+        Returns: Json;
       };
       agendar_publico: {
         Args: { p_slug: string; p_servico_id: string; p_profissional_id: string; p_inicio: string; p_nome: string; p_whatsapp: string; p_observacoes: string };

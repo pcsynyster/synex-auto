@@ -16,7 +16,7 @@ export default async function PaginaNovoAgendamento({ searchParams }: { searchPa
   const dataInicial = parametro && dataValida(parametro) && parametro >= hoje ? parametro : hoje;
 
   const [{ data: servicos }, { data: profissionais }] = await Promise.all([
-    ctx.supabase.from("servicos").select("id, nome, descricao, duracao_min, preco").eq("ativo", true).order("ordem").order("nome"),
+    ctx.supabase.from("servicos").select("id, nome, descricao, duracao_min, preco, categoria, adicional").eq("ativo", true).eq("adicional", false).order("ordem").order("nome"),
     ctx.supabase.from("profissionais").select("id, nome").eq("ativo", true).order("ordem").order("nome"),
   ]);
 

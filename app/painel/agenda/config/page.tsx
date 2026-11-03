@@ -27,7 +27,7 @@ export default async function PaginaConfigAgenda() {
       .eq("id", ctx.tenantId)
       .single(),
     ctx.supabase.from("horarios_funcionamento").select("dia_semana, abre, fecha, ativo"),
-    ctx.supabase.from("servicos").select("id, nome, duracao_min, preco, ativo").order("ordem").order("nome"),
+    ctx.supabase.from("servicos").select("id, nome, descricao, duracao_min, preco, ativo, categoria, adicional").order("ordem").order("nome"),
     ctx.supabase.from("bloqueios_agenda").select("id, inicio, motivo, profissional_id").gte("fim", new Date().toISOString()).order("inicio"),
     ctx.supabase.from("profissionais").select("id, nome, ativo").order("ordem").order("nome"),
   ]);

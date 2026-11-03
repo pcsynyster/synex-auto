@@ -21,7 +21,15 @@ function Etapa({ numero, titulo, children }: { numero: number; titulo: string; c
   );
 }
 
-export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaPublica }) {
+const CATEGORIA_PADRAO = "Serviços";
+
+export function AgendarCliente({ slug, agenda, cor = null }: { slug: string; agenda: AgendaPublica; cor?: string | null }) {
+  const principais = useMemo(() => agenda.servicos.filter((item) => !item.adicional), [agenda.servicos]);
+  const extras = useMemo(() => agenda.servicos.filter((item) => item.adicional), [agenda.servicos]);
+  const categorias = useMemo(() => [...new Set(principais.map((item) => item.categoria ?? CATEGORIA_PADRAO))], [principais]);
+  const gruposExtras = useMemo(() => [...new Set(extras.map((item) => item.categoria ?? "Adicionais"))], [extras]);
+  const [categoria, setCategoria] = useState(categorias[0] ?? CATEGORIA_PADRAO);
+  const [adicionais, setAdicionais] = useState<string[]>([]);
   const router = useRouter();
   const [servico, setServico] = useState<ServicoPublico | null>(null);
   const [data, setData] = useState<string | null>(null);
@@ -90,14 +98,16 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
     if (!servico || !horario) return;
     setErro(null);
     iniciarEnvio(async () => {
+      const observacoes = [cor ? `Cor: ${cor}` : "", String(formData.get("observacoes") ?? "").trim()].filter(Boolean).join(" · ").slice(0, 300);
       const resultado = await agendar({
         slug,
+        adicionais,
         servicoId: servico.id,
         profissionalId: profissional?.id ?? null,
         inicio: horario,
         nome: String(formData.get("nome") ?? ""),
         whatsapp: String(formData.get("whatsapp") ?? ""),
-        observacoes: String(formData.get("observacoes") ?? ""),
+        observacoes,
       });
       if (!resultado.ok) {
         setErro(resultado.erro);
@@ -108,11 +118,37 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
     });
   }
 
+  const escolhidos = extras.filter((item) => adicionais.includes(item.id));
+  const total = (servico ? Number(servico.preco) : 0) + escolhidos.reduce((soma, item) => soma + Number(item.preco), 0);
+
+  function alternarAdicional(id: string) {
+    setAdicionais((atual) => (atual.includes(id) ? atual.filter((item) => item !== id) : atual.length >= 8 ? atual : [...atual, id]));
+  }
+
   return (
     <div className="grid grid-cols-1 gap-4">
       <Etapa numero={1} titulo="Escolha o serviço">
+        {categorias.length > 1 && (
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+            {categorias.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setCategoria(item)}
+                aria-pressed={item === categoria}
+                className={`h-9 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors ${
+                  item === categoria ? "brilho text-white" : "border-borda bg-white/70 text-texto"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
         <ul className="grid gap-2">
-          {agenda.servicos.map((opcao) => {
+          {principais
+            .filter((opcao) => categorias.length <= 1 || (opcao.categoria ?? CATEGORIA_PADRAO) === categoria || opcao.id === servico?.id)
+            .map((opcao) => {
             const ativo = servico?.id === opcao.id;
             return (
               <li key={opcao.id}>
@@ -137,6 +173,44 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
             );
           })}
         </ul>
+        {servico && extras.length > 0 && (
+          <div className="grid gap-3 rounded-2xl border border-dashed border-prata/70 bg-white/50 p-3">
+            <p className="text-sm font-semibold">
+              Deixe ainda mais lindo <span className="font-normal text-suave">· opcional</span>
+            </p>
+            {gruposExtras.map((grupo) => (
+              <div key={grupo} className="grid gap-2">
+                <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-suave">{grupo}</p>
+                <div className="flex flex-wrap gap-2">
+                  {extras
+                    .filter((item) => (item.categoria ?? "Adicionais") === grupo)
+                    .map((item) => {
+                      const ativo = adicionais.includes(item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => alternarAdicional(item.id)}
+                          aria-pressed={ativo}
+                          title={item.descricao ?? undefined}
+                          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                            ativo ? "brilho text-white" : "border-borda bg-white/80 text-texto"
+                          }`}
+                        >
+                          {item.nome} <span className={ativo ? "text-white/80" : "text-suave"}>+ {formatarMoeda(Number(item.preco))}</span>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            ))}
+            {escolhidos.length > 0 && (
+              <p className="text-sm">
+                Total estimado: <span className="font-semibold">{formatarMoeda(total)}</span>
+              </p>
+            )}
+          </div>
+        )}
       </Etapa>
 
       {servico && variasProfissionais && (
@@ -226,10 +300,11 @@ export function AgendarCliente({ slug, agenda }: { slug: string; agenda: AgendaP
         <div ref={refDados} className="scroll-mt-4">
           <Etapa numero={numeroHorario + 1} titulo="Seus dados">
             <div className="rounded-2xl border border-borda bg-elevado px-4 py-3 text-sm">
-              <p className="font-semibold">{servico.nome}</p>
+              <p className="font-semibold">{[servico.nome, ...escolhidos.map((item) => item.nome)].join(" + ")}</p>
               <p className="text-suave">
-                {rotuloDataLonga(data)}, às {horaNoFuso(horario, agenda.fuso)} · {formatarMoeda(Number(servico.preco))}
+                {rotuloDataLonga(data)}, às {horaNoFuso(horario, agenda.fuso)} · {formatarMoeda(total)}
               </p>
+              {cor && <p className="text-suave">Cor escolhida: {cor}</p>}
               {variasProfissionais && <p className="text-suave">{profissional ? `Com ${profissional.nome}` : "Com a primeira profissional livre"}</p>}
             </div>
             <form action={enviar} className="grid gap-4">

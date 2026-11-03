@@ -124,6 +124,9 @@ const esquemaServico = z.object({
   duracao_min: z.number().int().min(10, "Duração mínima de 10 min.").max(720),
   preco: z.number().min(0).max(100000),
   ativo: z.boolean(),
+  descricao: z.string().trim().max(120).transform((valor) => valor || null).optional(),
+  categoria: z.string().trim().max(40).transform((valor) => valor || null).optional(),
+  adicional: z.boolean().optional(),
 });
 
 export type DadosServico = z.input<typeof esquemaServico>;

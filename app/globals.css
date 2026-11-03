@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@property --tom {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ec4899;
+}
+
+@property --tom-2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #b43df0;
+}
+
 @theme {
   --color-fundo: #f7f5f6;
   --color-superficie: #ffffff;
@@ -15,12 +27,13 @@
   --color-rosa-escuro: #d6337f;
   --color-rosa-claro: #fdeef4;
   --font-sans: "Inter Variable", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-serifa: "Instrument Serif", "Times New Roman", serif;
   --font-mono: "Inter Variable", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
 }
 
 @utility barra-prata {
-  background-image: linear-gradient(90deg, #ffb3d1 0%, #ff5fa2 55%, #c44dff 100%);
-  box-shadow: 0 0 12px -2px rgba(255, 79, 154, 0.55);
+  background-image: linear-gradient(90deg, color-mix(in oklab, var(--tom) 45%, white) 0%, var(--tom) 55%, var(--tom-2) 100%);
+  box-shadow: 0 0 12px -2px color-mix(in oklab, var(--tom) 60%, transparent);
 }
 
 @utility texto-prata {
@@ -38,9 +51,9 @@
 }
 
 @utility brilho {
-  background-color: #ec4899;
-  background-image: linear-gradient(135deg, #ff6fae 0%, #ec4899 45%, #c13cf0 100%);
-  box-shadow: 0 10px 28px -10px rgba(236, 72, 153, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  background-color: var(--tom);
+  background-image: linear-gradient(135deg, color-mix(in oklab, var(--tom) 72%, white) 0%, var(--tom) 45%, var(--tom-2) 100%);
+  box-shadow: 0 10px 28px -10px color-mix(in oklab, var(--tom) 75%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   border-color: transparent;
 }
 
@@ -74,8 +87,8 @@
   isolation: isolate;
   color: #ffffff;
   border-radius: 1.75rem;
-  background-image: radial-gradient(120% 90% at 0% 0%, #ff8cc0 0%, transparent 55%), radial-gradient(120% 120% at 100% 100%, #9b4dff 0%, transparent 55%), linear-gradient(135deg, #ff4f9a 0%, #e0379a 50%, #b43df0 100%);
-  box-shadow: 0 24px 50px -22px rgba(214, 51, 140, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  background-image: radial-gradient(120% 90% at 0% 0%, color-mix(in oklab, var(--tom) 55%, white) 0%, transparent 55%), radial-gradient(120% 120% at 100% 100%, var(--tom-2) 0%, transparent 60%), linear-gradient(135deg, var(--tom) 0%, color-mix(in oklab, var(--tom) 60%, var(--tom-2)) 55%, var(--tom-2) 100%);
+  box-shadow: 0 24px 50px -22px color-mix(in oklab, var(--tom) 85%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   &::before {
     content: "";
     position: absolute;
@@ -116,14 +129,14 @@
     height: 70vmax;
     left: -30vmax;
     top: -35vmax;
-    background: #ffc2dc;
+    background: color-mix(in oklab, var(--tom) 32%, white);
   }
   & span:nth-child(2) {
     width: 55vmax;
     height: 55vmax;
     right: -28vmax;
     top: -10vmax;
-    background: #e6c8ff;
+    background: color-mix(in oklab, var(--tom-2) 25%, white);
     animation-delay: -6s;
   }
   & span:nth-child(3) {
@@ -131,9 +144,14 @@
     height: 60vmax;
     left: -10vmax;
     bottom: -40vmax;
-    background: #ffd6e6;
+    background: color-mix(in oklab, var(--tom) 20%, white);
     animation-delay: -12s;
   }
+}
+
+@keyframes surgir {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
 }
 
 @keyframes reluzir {
@@ -167,6 +185,7 @@
 
 @layer base {
   html {
+    transition: --tom 0.8s ease, --tom-2 0.8s ease;
     color-scheme: light;
     -webkit-tap-highlight-color: transparent;
   }

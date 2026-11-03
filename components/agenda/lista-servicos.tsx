@@ -6,13 +6,36 @@ import { formatarDuracao } from "@/lib/datas";
 import { formatarMoeda } from "@/lib/formato";
 import type { Servico } from "@/types/database.types";
 
-type ServicoLista = Pick<Servico, "id" | "nome" | "duracao_min" | "preco" | "ativo">;
+type ServicoLista = Pick<
+  Servico,
+  | "id"
+  | "nome"
+  | "descricao"
+  | "duracao_min"
+  | "preco"
+  | "ativo"
+  | "categoria"
+  | "adicional"
+>;
 
-function Editor({ servico, aoFechar }: { servico: ServicoLista | null; aoFechar: () => void }) {
+function Editor({
+  servico,
+  aoFechar,
+  categorias,
+}: {
+  servico: ServicoLista | null;
+  aoFechar: () => void;
+  categorias: string[];
+}) {
   const [nome, setNome] = useState(servico?.nome ?? "");
   const [duracao, setDuracao] = useState(String(servico?.duracao_min ?? 60));
-  const [preco, setPreco] = useState(servico ? String(Number(servico.preco)).replace(".", ",") : "");
+  const [preco, setPreco] = useState(
+    servico ? String(Number(servico.preco)).replace(".", ",") : "",
+  );
   const [ativo, setAtivo] = useState(servico?.ativo ?? true);
+  const [descricao, setDescricao] = useState(servico?.descricao ?? "");
+  const [categoria, setCategoria] = useState(servico?.categoria ?? "");
+  const [adicional, setAdicional] = useState(servico?.adicional ?? false);
   const [erro, setErro] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
 
@@ -25,39 +48,105 @@ function Editor({ servico, aoFechar }: { servico: ServicoLista | null; aoFechar:
         duracao_min: Number(duracao),
         preco: Number(preco.replace(/\./g, "").replace(",", ".")) || 0,
         ativo,
+        descricao,
+        categoria,
+        adicional,
       });
       if (!resultado.ok) return setErro(resultado.erro);
       aoFechar();
     });
   }
 
-  const campo = "h-11 w-full min-w-0 rounded-xl border border-borda bg-elevado px-3 text-sm focus:border-prata focus:outline-none";
+  const campo =
+    "h-11 w-full min-w-0 rounded-xl border border-borda bg-elevado px-3 text-sm focus:border-prata focus:outline-none";
 
   return (
     <div className="grid gap-3 rounded-2xl border border-prata/40 bg-elevado p-3">
-      <input value={nome} onChange={(evento) => setNome(evento.target.value)} placeholder="Nome do serviço" className={campo} autoFocus />
+      <input
+        value={nome}
+        onChange={(evento) => setNome(evento.target.value)}
+        placeholder="Nome do serviço"
+        className={campo}
+        autoFocus
+      />
+      <input
+        value={descricao}
+        onChange={(evento) => setDescricao(evento.target.value)}
+        placeholder="Descrição curta (opcional)"
+        maxLength={120}
+        className={campo}
+      />
+      <input
+        value={categoria}
+        onChange={(evento) => setCategoria(evento.target.value)}
+        placeholder="Categoria (ex.: Unhas, Alongamentos)"
+        maxLength={40}
+        list="categorias-servico"
+        className={campo}
+      />
+      <datalist id="categorias-servico">
+        {categorias.map((item) => (
+          <option key={item} value={item} />
+        ))}
+      </datalist>
       <div className="grid grid-cols-2 gap-2">
         <label className="grid gap-1">
           <span className="text-[11px] text-suave">Duração (min)</span>
-          <input value={duracao} onChange={(evento) => setDuracao(evento.target.value.replace(/\D/g, ""))} inputMode="numeric" className={campo} />
+          <input
+            value={duracao}
+            onChange={(evento) =>
+              setDuracao(evento.target.value.replace(/\D/g, ""))
+            }
+            inputMode="numeric"
+            className={campo}
+          />
         </label>
         <label className="grid gap-1">
           <span className="text-[11px] text-suave">Preço (R$)</span>
-          <input value={preco} onChange={(evento) => setPreco(evento.target.value)} inputMode="decimal" placeholder="0,00" className={campo} />
+          <input
+            value={preco}
+            onChange={(evento) => setPreco(evento.target.value)}
+            inputMode="decimal"
+            placeholder="0,00"
+            className={campo}
+          />
         </label>
       </div>
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={adicional}
+          onChange={(evento) => setAdicional(evento.target.checked)}
+          className="size-4 accent-rosa"
+        />
+        É um adicional (decoração, francesinha...)
+      </label>
       {servico && (
         <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={ativo} onChange={(evento) => setAtivo(evento.target.checked)} className="size-4 accent-rosa" />
+          <input
+            type="checkbox"
+            checked={ativo}
+            onChange={(evento) => setAtivo(evento.target.checked)}
+            className="size-4 accent-rosa"
+          />
           Aparece na agenda online
         </label>
       )}
       {erro && <p className="text-xs text-alerta">{erro}</p>}
       <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={aoFechar} className="h-10 rounded-full border border-borda text-sm">
+        <button
+          type="button"
+          onClick={aoFechar}
+          className="h-10 rounded-full border border-borda text-sm"
+        >
           Cancelar
         </button>
-        <button type="button" onClick={salvar} disabled={pendente} className="h-10 rounded-full brilho text-sm font-semibold text-white disabled:opacity-50">
+        <button
+          type="button"
+          onClick={salvar}
+          disabled={pendente}
+          className="h-10 rounded-full brilho text-sm font-semibold text-white disabled:opacity-50"
+        >
           {pendente ? "Salvando..." : "Salvar"}
         </button>
       </div>
@@ -67,45 +156,87 @@ function Editor({ servico, aoFechar }: { servico: ServicoLista | null; aoFechar:
 
 export function ListaServicos({ servicos }: { servicos: ServicoLista[] }) {
   const [editando, setEditando] = useState<string | "novo" | null>(null);
+  const categorias = [
+    ...new Set(
+      servicos
+        .map((item) => item.categoria)
+        .filter((item): item is string => Boolean(item)),
+    ),
+  ];
+  const grupos = [
+    ...new Set(servicos.map((item) => item.categoria ?? "Sem categoria")),
+  ];
 
   return (
     <section className="cartao grid grid-cols-1 gap-3 p-4">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">Serviços</h2>
         {editando === null && (
-          <button type="button" onClick={() => setEditando("novo")} className="rounded-full border border-borda px-3 py-1 text-xs">
+          <button
+            type="button"
+            onClick={() => setEditando("novo")}
+            className="rounded-full border border-borda px-3 py-1 text-xs"
+          >
             Adicionar
           </button>
         )}
       </div>
-      {editando === "novo" && <Editor servico={null} aoFechar={() => setEditando(null)} />}
-      <ul className="grid gap-2">
-        {servicos.map((servico) =>
-          editando === servico.id ? (
-            <li key={servico.id}>
-              <Editor servico={servico} aoFechar={() => setEditando(null)} />
-            </li>
-          ) : (
-            <li key={servico.id}>
-              <button
-                type="button"
-                onClick={() => setEditando(servico.id)}
-                className={`flex w-full items-center justify-between gap-3 rounded-2xl border border-borda bg-elevado/40 px-4 py-3 text-left ${servico.ativo ? "" : "opacity-50"}`}
-              >
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">{servico.nome}</span>
-                  <span className="block text-xs text-suave">
-                    {formatarDuracao(servico.duracao_min)}
-                    {servico.ativo ? "" : " · oculto"}
-                  </span>
-                </span>
-                <span className="shrink-0 text-sm font-semibold tabular-nums">{formatarMoeda(Number(servico.preco))}</span>
-              </button>
-            </li>
-          ),
-        )}
-      </ul>
-      <p className="text-xs text-suave">A duração define quanto tempo o horário fica ocupado na agenda.</p>
+      {editando === "novo" && (
+        <Editor
+          servico={null}
+          categorias={categorias}
+          aoFechar={() => setEditando(null)}
+        />
+      )}
+      {grupos.map((grupo) => (
+        <div key={grupo} className="grid gap-2">
+          {grupos.length > 1 && (
+            <p className="pt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-suave">
+              {grupo}
+            </p>
+          )}
+          <ul className="grid gap-2">
+            {servicos
+              .filter((item) => (item.categoria ?? "Sem categoria") === grupo)
+              .map((servico) =>
+                editando === servico.id ? (
+                  <li key={servico.id}>
+                    <Editor
+                      servico={servico}
+                      categorias={categorias}
+                      aoFechar={() => setEditando(null)}
+                    />
+                  </li>
+                ) : (
+                  <li key={servico.id}>
+                    <button
+                      type="button"
+                      onClick={() => setEditando(servico.id)}
+                      className={`flex w-full items-center justify-between gap-3 rounded-2xl border border-borda bg-elevado/40 px-4 py-3 text-left ${servico.ativo ? "" : "opacity-50"}`}
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold">
+                          {servico.nome}
+                        </span>
+                        <span className="block text-xs text-suave">
+                          {formatarDuracao(servico.duracao_min)}
+                          {servico.adicional ? " · adicional" : ""}
+                          {servico.ativo ? "" : " · oculto"}
+                        </span>
+                      </span>
+                      <span className="shrink-0 text-sm font-semibold tabular-nums">
+                        {formatarMoeda(Number(servico.preco))}
+                      </span>
+                    </button>
+                  </li>
+                ),
+              )}
+          </ul>
+        </div>
+      ))}
+      <p className="text-xs text-suave">
+        A duração define quanto tempo o horário fica ocupado na agenda.
+      </p>
     </section>
   );
 }

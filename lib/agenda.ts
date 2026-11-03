@@ -6,6 +6,8 @@ export type ServicoPublico = {
   descricao: string | null;
   duracao_min: number;
   preco: number;
+  categoria: string | null;
+  adicional: boolean;
 };
 
 export type AgendaPublica = {

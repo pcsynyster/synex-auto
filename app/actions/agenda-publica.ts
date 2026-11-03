@@ -37,6 +37,7 @@ const esquemaAgendamento = z.object({
     .transform(normalizarWhatsapp)
     .refine((valor): valor is string => valor !== null, "WhatsApp inválido. Use DDD + número."),
   observacoes: z.string().trim().max(300).optional(),
+  adicionais: z.array(z.uuid()).max(8).optional(),
 });
 
 export type DadosAgendamento = z.input<typeof esquemaAgendamento>;
@@ -45,9 +46,9 @@ export async function agendar(dados: DadosAgendamento): Promise<Resultado<{ toke
   const validacao = esquemaAgendamento.safeParse(dados);
   if (!validacao.success) return falha(validacao.error.issues[0]?.message ?? "Confira os dados.");
 
-  const { slug, servicoId, profissionalId, inicio, nome, whatsapp, observacoes } = validacao.data;
+  const { slug, servicoId, profissionalId, inicio, nome, whatsapp, observacoes, adicionais } = validacao.data;
 
-  const { data, error } = await criarClienteAnonimo().rpc("agendar_publico", {
+  const { data, error } = await criarClienteAnonimo().rpc("agendar_publico_com_adicionais", {
     p_slug: slug,
     p_servico_id: servicoId,
     p_profissional_id: profissionalId as string,
@@ -55,6 +56,7 @@ export async function agendar(dados: DadosAgendamento): Promise<Resultado<{ toke
     p_nome: nome,
     p_whatsapp: whatsapp,
     p_observacoes: (observacoes || null) as string,
+    p_adicionais: adicionais ?? [],
   });
 
   if (error || !data) return falha(traduzirErroAgenda(error?.message ?? ""));
